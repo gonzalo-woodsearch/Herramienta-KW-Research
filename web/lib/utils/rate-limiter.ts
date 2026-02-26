@@ -2,7 +2,7 @@
  * Rate limiter usando token bucket algorithm
  */
 
-import logger from './logger.js';
+import logger from './logger';
 
 export interface RateLimiterOptions {
   requestsPerMinute: number;

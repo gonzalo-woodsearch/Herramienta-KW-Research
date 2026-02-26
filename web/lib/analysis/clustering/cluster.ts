@@ -2,8 +2,8 @@
  * Clustering de keywords por tratamiento dental
  */
 
-import { Keyword, ClusteredKeywords } from '../../types.js';
-import logger from '../../utils/logger.js';
+import { Keyword, ClusteredKeywords } from '../../types';
+import logger from '../../utils/logger';
 
 /**
  * Agrupa keywords por tratamiento dental

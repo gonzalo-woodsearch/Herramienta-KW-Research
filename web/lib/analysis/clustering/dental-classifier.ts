@@ -2,8 +2,8 @@
  * Clasificador de tratamientos dentales para España
  */
 
-import { normalize } from './normalizer.js';
-import logger from '../../utils/logger.js';
+import { normalize } from './normalizer';
+import logger from '../../utils/logger';
 
 /**
  * Patrones de tratamientos dentales

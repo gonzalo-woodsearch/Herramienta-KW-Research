@@ -2,8 +2,8 @@
  * Sistema de cache en memoria con TTL
  */
 
-import { CacheEntry } from '../types.js';
-import logger from '../utils/logger.js';
+import { CacheEntry } from '../types';
+import logger from '../utils/logger';
 
 export class Cache {
   private store: Map<string, CacheEntry<any>>;

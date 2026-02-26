@@ -2,7 +2,7 @@
  * Sistema de retry con backoff exponencial
  */
 
-import logger from './logger.js';
+import logger from './logger';
 
 export interface RetryOptions {
   attempts: number;

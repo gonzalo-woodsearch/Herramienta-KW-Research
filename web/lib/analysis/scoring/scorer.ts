@@ -2,9 +2,9 @@
  * Sistema de scoring 0-100 para keywords
  */
 
-import { Keyword, ScoreBreakdown } from '../../types.js';
-import { calculateBoosts } from './boosts.js';
-import logger from '../../utils/logger.js';
+import { Keyword, ScoreBreakdown } from '../../types';
+import { calculateBoosts } from './boosts';
+import logger from '../../utils/logger';
 
 // Scoring weights: volume(40%), cpc(20%), kd(30%), competition(10%)
 const LIMITS = {

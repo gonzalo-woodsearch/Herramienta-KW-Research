@@ -2,7 +2,7 @@
  * Sistema de logging simple
  */
 
-import config from '../config.js';
+import config from '../config';
 
 export enum LogLevel {
   DEBUG = 0,

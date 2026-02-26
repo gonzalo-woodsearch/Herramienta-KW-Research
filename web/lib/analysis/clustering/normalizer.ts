@@ -2,8 +2,8 @@
  * Normalización y deduplicación de keywords
  */
 
-import { Keyword } from '../../types.js';
-import logger from '../../utils/logger.js';
+import { Keyword } from '../../types';
+import logger from '../../utils/logger';
 
 /**
  * Normaliza una keyword:

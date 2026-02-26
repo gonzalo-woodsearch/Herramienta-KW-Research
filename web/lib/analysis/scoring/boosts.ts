@@ -2,9 +2,9 @@
  * Sistema de boosts para scoring
  */
 
-import { Keyword } from '../../types.js';
-import { isCoreTreatment } from '../clustering/dental-classifier.js';
-import logger from '../../utils/logger.js';
+import { Keyword } from '../../types';
+import { isCoreTreatment } from '../clustering/dental-classifier';
+import logger from '../../utils/logger';
 
 const BOOST_CONFIG = {
   localWithCity: 10,

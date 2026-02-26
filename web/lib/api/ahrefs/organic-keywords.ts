@@ -2,16 +2,16 @@
  * Endpoint: Site Explorer - Organic Keywords
  */
 
-import AhrefsClient from './client.js';
+import AhrefsClient from './client';
 import {
   AhrefsOrganicKeywordsRequest,
   AhrefsOrganicKeywordsResponse,
   AhrefsOrganicKeyword,
-} from './types.js';
-import { Keyword } from '../../types.js';
-import cache from '../cache.js';
-import config from '../../config.js';
-import logger from '../../utils/logger.js';
+} from './types';
+import { Keyword } from '../../types';
+import cache from '../cache';
+import config from '../../config';
+import logger from '../../utils/logger';
 
 const DEFAULT_SELECT = 'keyword,position,traffic,volume,url';
 const DEFAULT_LIMIT = 100;

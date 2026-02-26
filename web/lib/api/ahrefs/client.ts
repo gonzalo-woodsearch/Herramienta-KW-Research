@@ -3,10 +3,10 @@
  */
 
 import fetch from 'node-fetch';
-import config from '../../config.js';
-import logger from '../../utils/logger.js';
-import { retry } from '../../utils/retry.js';
-import { RateLimiter } from '../../utils/rate-limiter.js';
+import config from '../../config';
+import logger from '../../utils/logger';
+import { retry } from '../../utils/retry';
+import { RateLimiter } from '../../utils/rate-limiter';
 
 const AHREFS_API_BASE = 'https://api.ahrefs.com/v3';
 

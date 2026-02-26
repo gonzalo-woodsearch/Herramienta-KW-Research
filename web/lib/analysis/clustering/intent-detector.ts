@@ -2,9 +2,9 @@
  * Detector de intención: Local y Comercial
  */
 
-import { Intent } from './types.js';
-import { normalize } from './normalizer.js';
-import logger from '../../utils/logger.js';
+import { Intent } from './types';
+import { normalize } from './normalizer';
+import logger from '../../utils/logger';
 
 /**
  * Principales ciudades españolas
