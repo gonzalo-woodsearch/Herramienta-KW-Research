@@ -1,0 +1,31 @@
+Keyword,Volume,CPC (EUR),Competition,KD,Treatment,Local Intent,City,Commercial Intent,Score,URL,Position
+implantes dentales madrid,1500,3.20,HIGH,45,implantes,Yes,madrid,Yes,85,https://example.com/implantes,3
+precio ortodoncia invisible,890,2.80,MEDIUM,38,ortodoncia,No,N/A,Yes,78,https://example.com/ortodoncia,5
+carillas dentales barcelona,720,3.50,HIGH,42,carillas,Yes,barcelona,No,76,https://example.com/carillas,4
+blanqueamiento dental precio,1200,2.20,MEDIUM,25,blanqueamiento,No,N/A,Yes,82,https://example.com/blanqueamiento,2
+dentista urgencias madrid 24h,650,4.10,HIGH,35,urgencias,Yes,madrid,Yes,88,https://example.com/urgencias,1
+ortodoncia invisible invisalign,980,3.80,HIGH,48,ortodoncia,No,N/A,No,72,https://example.com/invisalign,6
+implantes dentales precio,1350,3.00,HIGH,40,implantes,No,N/A,Yes,84,https://example.com/implantes-precio,2
+clinica dental valencia centro,450,2.90,MEDIUM,30,sin_clasificar,Yes,valencia,No,68,https://example.com/valencia,8
+carillas porcelana precio,580,3.20,MEDIUM,35,carillas,No,N/A,Yes,74,https://example.com/carillas-porcelana,7
+endodoncia molar precio,420,2.50,LOW,22,endodoncia,No,N/A,Yes,71,https://example.com/endodoncia,9
+periodoncia tratamiento encias,380,2.10,LOW,28,periodoncia,No,N/A,No,62,https://example.com/periodoncia,12
+limpieza dental profunda,890,1.80,MEDIUM,18,limpieza,No,N/A,No,68,https://example.com/limpieza,10
+extraccion muelas juicio barcelona,520,2.70,MEDIUM,32,extraccion,Yes,barcelona,No,70,https://example.com/extracciones,11
+implantes cigomaticos madrid,340,4.50,HIGH,55,implantes,Yes,madrid,No,75,https://example.com/cigomaticos,15
+ortodoncia brackets metalicos,670,2.40,LOW,20,ortodoncia,No,N/A,No,65,https://example.com/brackets,14
+blanqueamiento laser dental,780,2.90,MEDIUM,30,blanqueamiento,No,N/A,No,72,https://example.com/blanqueamiento-laser,13
+dentista infantil sevilla,290,2.20,LOW,25,odontopediatria,Yes,sevilla,No,58,https://example.com/infantil,18
+protesis dental fija,410,2.60,MEDIUM,28,protesis,No,N/A,No,64,https://example.com/protesis,16
+cirugia oral malaga,310,3.10,MEDIUM,35,cirugia,Yes,malaga,No,62,https://example.com/cirugia,17
+urgencias dentales fin de semana,580,3.80,HIGH,38,urgencias,No,N/A,Yes,78,https://example.com/urgencias-finde,19
+implantes all on 4 precio,450,4.20,HIGH,50,implantes,No,N/A,Yes,80,https://example.com/all-on-4,20
+ortodoncia invisible financiacion,520,3.30,MEDIUM,35,ortodoncia,No,N/A,Yes,76,https://example.com/ortodoncia-financiacion,21
+carillas composite madrid,380,2.80,MEDIUM,30,carillas,Yes,madrid,No,68,https://example.com/carillas-composite,22
+blanqueamiento dientes casero,920,1.50,LOW,15,blanqueamiento,No,N/A,No,64,https://example.com/blanqueamiento-casero,23
+dentista cerca de mi,1800,2.50,HIGH,20,sin_clasificar,Yes,N/A,No,78,https://example.com,24
+implantes dentales baratos,680,2.90,MEDIUM,32,implantes,No,N/A,Yes,72,https://example.com/implantes-baratos,25
+ortodoncia adultos barcelona,450,3.10,MEDIUM,35,ortodoncia,Yes,barcelona,No,70,https://example.com/ortodoncia-adultos,26
+primera visita dentista gratis,540,2.20,MEDIUM,18,sin_clasificar,No,N/A,Yes,66,https://example.com/primera-visita,27
+estetica dental sonrisa,380,3.40,HIGH,40,carillas,No,N/A,No,68,https://example.com/estetica,28
+limpieza bucal profesional,620,1.90,LOW,20,limpieza,No,N/A,No,62,https://example.com/limpieza-profesional,29

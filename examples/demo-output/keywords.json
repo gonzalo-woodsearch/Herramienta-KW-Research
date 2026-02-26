@@ -1,0 +1,149 @@
+{
+  "metadata": {
+    "url": "https://example.com/implantes-dentales",
+    "country": "ES",
+    "language": "es",
+    "timestamp": "2026-02-26T12:30:00Z",
+    "totalKeywords": 30,
+    "processingTime": 45230
+  },
+  "keywords": [
+    {
+      "keyword": "dentista urgencias madrid 24h",
+      "normalizedKeyword": "dentista urgencias madrid 24h",
+      "position": 1,
+      "traffic": 280,
+      "ahrefsVolume": 650,
+      "url": "https://example.com/urgencias",
+      "avgMonthlySearches": 650,
+      "competition": "HIGH",
+      "cpcMicros": 4100000,
+      "treatment": "urgencias",
+      "hasLocalIntent": true,
+      "city": "madrid",
+      "hasCommercialIntent": true,
+      "commercialSignals": ["urgencias", "24h"],
+      "score": 88,
+      "scoreBreakdown": {
+        "volume": 26.0,
+        "cpc": 16.4,
+        "kd": 10.5,
+        "competition": 10.0,
+        "boosts": 15,
+        "total": 88
+      }
+    },
+    {
+      "keyword": "implantes dentales madrid",
+      "normalizedKeyword": "implantes dentales madrid",
+      "position": 3,
+      "traffic": 520,
+      "ahrefsVolume": 1500,
+      "url": "https://example.com/implantes",
+      "avgMonthlySearches": 1500,
+      "competition": "HIGH",
+      "cpcMicros": 3200000,
+      "keywordDifficulty": 45,
+      "treatment": "implantes",
+      "hasLocalIntent": true,
+      "city": "madrid",
+      "hasCommercialIntent": false,
+      "commercialSignals": [],
+      "score": 85,
+      "scoreBreakdown": {
+        "volume": 40.0,
+        "cpc": 12.8,
+        "kd": 13.5,
+        "competition": 10.0,
+        "boosts": 20,
+        "total": 85
+      }
+    },
+    {
+      "keyword": "implantes dentales precio",
+      "normalizedKeyword": "implantes dentales precio",
+      "position": 2,
+      "traffic": 480,
+      "ahrefsVolume": 1350,
+      "url": "https://example.com/implantes-precio",
+      "avgMonthlySearches": 1350,
+      "competition": "HIGH",
+      "cpcMicros": 3000000,
+      "keywordDifficulty": 40,
+      "treatment": "implantes",
+      "hasLocalIntent": false,
+      "hasCommercialIntent": true,
+      "commercialSignals": ["precio"],
+      "score": 84,
+      "scoreBreakdown": {
+        "volume": 38.0,
+        "cpc": 12.0,
+        "kd": 12.0,
+        "competition": 10.0,
+        "boosts": 15,
+        "total": 84
+      }
+    }
+  ],
+  "clusters": [
+    {
+      "treatment": "urgencias",
+      "count": 2,
+      "avgScore": 83,
+      "totalVolume": 1230,
+      "topKeywords": [
+        {
+          "keyword": "dentista urgencias madrid 24h",
+          "score": 88,
+          "avgMonthlySearches": 650
+        },
+        {
+          "keyword": "urgencias dentales fin de semana",
+          "score": 78,
+          "avgMonthlySearches": 580
+        }
+      ]
+    },
+    {
+      "treatment": "implantes",
+      "count": 7,
+      "avgScore": 78,
+      "totalVolume": 4710,
+      "topKeywords": [
+        {
+          "keyword": "implantes dentales madrid",
+          "score": 85,
+          "avgMonthlySearches": 1500
+        },
+        {
+          "keyword": "implantes dentales precio",
+          "score": 84,
+          "avgMonthlySearches": 1350
+        },
+        {
+          "keyword": "implantes all on 4 precio",
+          "score": 80,
+          "avgMonthlySearches": 450
+        }
+      ]
+    },
+    {
+      "treatment": "ortodoncia",
+      "count": 5,
+      "avgScore": 72,
+      "totalVolume": 3020,
+      "topKeywords": [
+        {
+          "keyword": "precio ortodoncia invisible",
+          "score": 78,
+          "avgMonthlySearches": 890
+        },
+        {
+          "keyword": "ortodoncia invisible financiacion",
+          "score": 76,
+          "avgMonthlySearches": 520
+        }
+      ]
+    }
+  ]
+}
