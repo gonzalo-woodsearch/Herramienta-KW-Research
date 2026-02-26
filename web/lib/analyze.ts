@@ -3,15 +3,15 @@
  * This imports and executes the core analysis pipeline
  */
 
-import { Keyword, ClusteredKeywords } from '../../src/types.js';
+import { Keyword, ClusteredKeywords } from './types.js';
 
 // Import core services
-import { organicKeywordsService } from '../../src/api/ahrefs/organic-keywords.js';
-import { deduplicate } from '../../src/analysis/clustering/normalizer.js';
-import { detectTreatment } from '../../src/analysis/clustering/dental-classifier.js';
-import { detectIntent } from '../../src/analysis/clustering/intent-detector.js';
-import { scoreKeywords } from '../../src/analysis/scoring/scorer.js';
-import { clusterByTreatment } from '../../src/analysis/clustering/cluster.js';
+import { organicKeywordsService } from './api/ahrefs/organic-keywords.js';
+import { deduplicate } from './analysis/clustering/normalizer.js';
+import { detectTreatment } from './analysis/clustering/dental-classifier.js';
+import { detectIntent } from './analysis/clustering/intent-detector.js';
+import { scoreKeywords } from './analysis/scoring/scorer.js';
+import { clusterByTreatment } from './analysis/clustering/cluster.js';
 
 export interface AnalysisRequest {
   url: string;
