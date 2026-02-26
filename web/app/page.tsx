@@ -4,6 +4,7 @@ import { useState, useMemo } from 'react';
 import styles from './page.module.css';
 
 type LocalLevel = 'none' | 'national' | 'regional' | 'city' | 'neighborhood' | 'ultralocal';
+type IntentType = 'transaccional' | 'informacional' | 'comercial' | 'local' | 'general';
 
 interface Keyword {
   keyword: string;
@@ -19,8 +20,17 @@ interface Keyword {
   region?: string;
   localScore?: number;
   hasCommercialIntent?: boolean;
+  intentType?: IntentType;
   score?: number;
 }
+
+const INTENT_META: Record<IntentType, { label: string; color: string; bg: string; border: string; desc: string }> = {
+  transaccional: { label: 'Transaccional', color: '#15803d', bg: '#f0fdf4', border: '#86efac', desc: 'Usuario listo para contratar' },
+  informacional: { label: 'Informacional', color: '#1d4ed8', bg: '#eff6ff', border: '#93c5fd', desc: 'Usuario buscando información' },
+  comercial:     { label: 'Comercial',     color: '#c2410c', bg: '#fff7ed', border: '#fdba74', desc: 'Usuario comparando precios' },
+  local:         { label: 'Local',         color: '#7c3aed', bg: '#faf5ff', border: '#c4b5fd', desc: 'Búsqueda con intención geográfica' },
+  general:       { label: 'General',       color: '#475569', bg: '#f8fafc', border: '#cbd5e1', desc: 'Intención no clasificada' },
+};
 
 interface Cluster {
   treatment: string;
@@ -88,12 +98,13 @@ export default function Home() {
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const [activeTab, setActiveTab] = useState<'keywords' | 'clusters' | 'local'>('keywords');
   const [filterTreatment, setFilterTreatment] = useState('all');
+  const [filterIntent, setFilterIntent] = useState<IntentType | 'all'>('all');
   const [sortBy, setSortBy] = useState<'score' | 'traffic' | 'position'>('score');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(''); setResult(null); setLoading(true);
-    setFilterTreatment('all'); setActiveTab('keywords');
+    setFilterTreatment('all'); setFilterIntent('all'); setActiveTab('keywords');
     try {
       const res = await fetch('/api/analyze', {
         method: 'POST',
@@ -118,12 +129,23 @@ export default function Home() {
     if (!result) return [];
     let kws = result.keywords;
     if (filterTreatment !== 'all') kws = kws.filter(k => (k.treatment || 'sin clasificar') === filterTreatment);
+    if (filterIntent !== 'all') kws = kws.filter(k => (k.intentType || 'general') === filterIntent);
     return [...kws].sort((a, b) => {
       if (sortBy === 'score') return (b.score || 0) - (a.score || 0);
       if (sortBy === 'traffic') return (b.traffic || 0) - (a.traffic || 0);
       return (a.position || 999) - (b.position || 999);
     });
-  }, [result, filterTreatment, sortBy]);
+  }, [result, filterTreatment, filterIntent, sortBy]);
+
+  const intentCounts = useMemo(() => {
+    if (!result) return {} as Record<string, number>;
+    const counts: Record<string, number> = { all: result.keywords.length };
+    for (const kw of result.keywords) {
+      const t = kw.intentType || 'general';
+      counts[t] = (counts[t] || 0) + 1;
+    }
+    return counts;
+  }, [result]);
 
   const maxCount = result ? Math.max(...result.clusters.map(c => c.count), 1) : 1;
 
@@ -137,6 +159,23 @@ export default function Home() {
           className={styles.urlInput}
         />
       </div>
+      {!compact && (
+        <div className={styles.intentPicker}>
+          <span className={styles.intentPickerLabel}>¿Qué tipo de keywords te interesan?</span>
+          <div className={styles.intentPickerChips}>
+            {([['all', '🔎', 'Todas'], ['transaccional', '🛒', 'Transaccionales'], ['informacional', '📚', 'Informacionales'], ['comercial', '💼', 'Comparativas'], ['local', '📍', 'Locales']] as const).map(([v, emoji, label]) => (
+              <button
+                key={v}
+                type="button"
+                onClick={() => setFilterIntent(v as IntentType | 'all')}
+                className={filterIntent === v ? styles.intentChipActive : styles.intentChip}
+              >
+                {emoji} {label}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
       <div className={styles.formControls}>
         <select value={limit} onChange={e => setLimit(Number(e.target.value))} className={styles.select}>
           <option value={30}>30 keywords</option>
@@ -270,29 +309,52 @@ export default function Home() {
 
             {activeTab === 'keywords' && (
               <div className={styles.card}>
+                {/* FILTER BAR REDISEÑADO */}
                 <div className={styles.filterBar}>
-                  <div className={styles.filterChips}>
-                    <button
-                      className={filterTreatment === 'all' ? styles.chipActive : styles.chip}
-                      onClick={() => setFilterTreatment('all')}
-                    >
-                      Todos ({result.keywords.length})
-                    </button>
-                    {treatments.map(t => (
-                      <button
-                        key={t}
-                        className={filterTreatment === t ? styles.chipActive : styles.chip}
-                        onClick={() => setFilterTreatment(t)}
-                      >
-                        {t} ({result.keywords.filter(k => (k.treatment || 'sin clasificar') === t).length})
+                  <div className={styles.filterRow}>
+                    <span className={styles.filterLabel}>Intención</span>
+                    <div className={styles.filterChips}>
+                      <button className={filterIntent === 'all' ? styles.chipActive : styles.chip} onClick={() => setFilterIntent('all')}>
+                        Todas <span className={styles.chipCount}>{intentCounts.all || 0}</span>
                       </button>
-                    ))}
+                      {(Object.entries(INTENT_META) as [IntentType, typeof INTENT_META[IntentType]][]).map(([type, meta]) => (
+                        intentCounts[type] ? (
+                          <button
+                            key={type}
+                            className={filterIntent === type ? styles.chipActive : styles.chip}
+                            onClick={() => setFilterIntent(type)}
+                            title={meta.desc}
+                          >
+                            {type === 'transaccional' ? '🛒' : type === 'informacional' ? '📚' : type === 'comercial' ? '💼' : type === 'local' ? '📍' : '·'}{' '}
+                            {meta.label} <span className={styles.chipCount}>{intentCounts[type]}</span>
+                          </button>
+                        ) : null
+                      ))}
+                    </div>
                   </div>
-                  <select value={sortBy} onChange={e => setSortBy(e.target.value as any)} className={styles.sortSelect}>
-                    <option value="score">↕ Score</option>
-                    <option value="traffic">↕ Tráfico</option>
-                    <option value="position">↕ Posición</option>
-                  </select>
+                  <div className={styles.filterRow}>
+                    <span className={styles.filterLabel}>Tratamiento</span>
+                    <div className={styles.filterChips}>
+                      <button className={filterTreatment === 'all' ? styles.chipActive : styles.chip} onClick={() => setFilterTreatment('all')}>
+                        Todos <span className={styles.chipCount}>{result.keywords.length}</span>
+                      </button>
+                      {treatments.map(t => (
+                        <button key={t} className={filterTreatment === t ? styles.chipActive : styles.chip} onClick={() => setFilterTreatment(t)}>
+                          {t} <span className={styles.chipCount}>{result.keywords.filter(k => (k.treatment || 'sin clasificar') === t).length}</span>
+                        </button>
+                      ))}
+                    </div>
+                    <select value={sortBy} onChange={e => setSortBy(e.target.value as any)} className={styles.sortSelect}>
+                      <option value="score">↕ Score</option>
+                      <option value="traffic">↕ Tráfico</option>
+                      <option value="position">↕ Posición</option>
+                    </select>
+                  </div>
+                  <div className={styles.filterSummary}>
+                    Mostrando <strong>{filteredKeywords.length}</strong> de <strong>{result.keywords.length}</strong> keywords
+                    {filterIntent !== 'all' && <span className={styles.filterTag}>· {INTENT_META[filterIntent].label}</span>}
+                    {filterTreatment !== 'all' && <span className={styles.filterTag}>· {filterTreatment}</span>}
+                  </div>
                 </div>
 
                 <div className={styles.tableWrapper}>
@@ -303,10 +365,9 @@ export default function Home() {
                         <th>Keyword</th>
                         <th>Pos.</th>
                         <th>Tráfico</th>
-                        <th>Volumen</th>
                         <th>Tratamiento</th>
-                        <th>Localidad</th>
                         <th>Intención</th>
+                        <th>Localidad</th>
                         <th>Score</th>
                       </tr>
                     </thead>
@@ -324,12 +385,23 @@ export default function Home() {
                             </span>
                           </td>
                           <td className={styles.numCell}>{(kw.traffic || 0).toLocaleString()}</td>
-                          <td className={styles.numCell}>{(kw.ahrefsVolume || 0).toLocaleString()}</td>
                           <td>
                             {kw.treatment
                               ? <span className={styles.treatBadge}>{kw.treatment}</span>
-                              : <span className={styles.unclsBadge}>sin clasificar</span>
+                              : <span className={styles.unclsBadge}>—</span>
                             }
+                          </td>
+                          <td>
+                            {(() => {
+                              const it = (kw.intentType || 'general') as IntentType;
+                              const meta = INTENT_META[it];
+                              const emoji = it === 'transaccional' ? '🛒' : it === 'informacional' ? '📚' : it === 'comercial' ? '💼' : it === 'local' ? '📍' : '·';
+                              return (
+                                <span className={styles.intentBadge} style={{ color: meta.color, background: meta.bg, borderColor: meta.border }}>
+                                  {emoji} {meta.label}
+                                </span>
+                              );
+                            })()}
                           </td>
                           <td>
                             {kw.localLevel && kw.localLevel !== 'none' && (() => {
@@ -341,9 +413,6 @@ export default function Home() {
                                 </span>
                               );
                             })()}
-                          </td>
-                          <td className={styles.intentCell}>
-                            {kw.hasCommercialIntent && <span className={styles.commBadge}>💰 comercial</span>}
                           </td>
                           <td className={styles.scoreCell}>
                             <div className={styles.scoreBar}>

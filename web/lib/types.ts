@@ -30,6 +30,7 @@ export interface Keyword {
   localScore?: number;
   hasCommercialIntent?: boolean;
   commercialSignals?: string[];
+  intentType?: string;
 
   // Scoring
   score?: number;

@@ -299,48 +299,145 @@
 /* CARD */
 .card { background: white; border-radius: 1rem; box-shadow: 0 1px 4px rgba(0,0,0,0.08); overflow: hidden; }
 
-/* FILTER BAR */
+/* FILTER BAR - REDISEÑADO */
 .filterBar {
-  padding: 1rem 1.25rem;
+  padding: 0;
+  border-bottom: 1px solid #e2e8f0;
+}
+.filterRow {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 0.75rem;
+  padding: 0.75rem 1.25rem;
   border-bottom: 1px solid #f1f5f9;
   flex-wrap: wrap;
 }
-.filterChips { display: flex; gap: 0.5rem; flex-wrap: wrap; flex: 1; }
+.filterRow:last-child { border-bottom: none; }
+.filterLabel {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  min-width: 80px;
+  flex-shrink: 0;
+}
+.filterChips { display: flex; gap: 0.4rem; flex-wrap: wrap; flex: 1; }
 .chip {
-  padding: 0.35rem 0.875rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.28rem 0.75rem;
   background: #f8fafc;
   border: 1.5px solid #e2e8f0;
   border-radius: 9999px;
-  font-size: 0.82rem;
+  font-size: 0.8rem;
   font-weight: 500;
-  color: #475569;
+  color: #64748b;
   cursor: pointer;
   transition: all 0.15s;
   white-space: nowrap;
 }
-.chip:hover { border-color: #2563eb; color: #2563eb; }
+.chip:hover { border-color: #2563eb; color: #2563eb; background: #eff6ff; }
 .chipActive {
-  padding: 0.35rem 0.875rem;
-  background: #eff6ff;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.28rem 0.75rem;
+  background: #2563eb;
   border: 1.5px solid #2563eb;
   border-radius: 9999px;
-  font-size: 0.82rem;
+  font-size: 0.8rem;
   font-weight: 600;
-  color: #2563eb;
+  color: white;
   cursor: pointer;
   white-space: nowrap;
 }
+.chipCount {
+  background: rgba(0,0,0,0.12);
+  border-radius: 9999px;
+  padding: 0 0.4rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+.chipActive .chipCount { background: rgba(255,255,255,0.25); }
+.filterSummary {
+  padding: 0.5rem 1.25rem;
+  font-size: 0.8rem;
+  color: #94a3b8;
+  background: #fafafa;
+  border-top: 1px solid #f1f5f9;
+}
+.filterTag {
+  color: #2563eb;
+  font-weight: 600;
+}
 .sortSelect {
-  padding: 0.4rem 0.75rem;
+  padding: 0.35rem 0.65rem;
   border: 1.5px solid #e2e8f0;
   border-radius: 0.5rem;
-  font-size: 0.85rem;
+  font-size: 0.82rem;
   background: white;
   color: #374151;
   cursor: pointer;
+  margin-left: auto;
+}
+
+/* INTENT PICKER (en el form hero) */
+.intentPicker {
+  padding: 1rem;
+  background: #f8fafc;
+  border-radius: 0.75rem;
+  border: 1.5px solid #e2e8f0;
+}
+.intentPickerLabel {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #64748b;
+  margin-bottom: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.intentPickerChips {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+.intentChip {
+  padding: 0.45rem 1rem;
+  background: white;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 0.625rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #475569;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.intentChip:hover { border-color: #2563eb; color: #2563eb; }
+.intentChipActive {
+  padding: 0.45rem 1rem;
+  background: #2563eb;
+  border: 1.5px solid #2563eb;
+  border-radius: 0.625rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: white;
+  cursor: pointer;
+}
+
+/* INTENT BADGE (columna Intención en tabla) */
+.intentBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.22rem 0.65rem;
+  border-radius: 9999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  white-space: nowrap;
+  border: 1px solid;
 }
 
 /* TABLE */

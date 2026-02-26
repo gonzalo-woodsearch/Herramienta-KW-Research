@@ -2,7 +2,7 @@
  * Detector de intención: Local (con niveles ultra-local) y Comercial
  */
 
-import { Intent, LocalInfo, LocalLevel } from './types';
+import { Intent, IntentType, LocalInfo, LocalLevel } from './types';
 import { normalize } from './normalizer';
 import logger from '../../utils/logger';
 
@@ -347,22 +347,77 @@ export function detectCommercialSignals(keyword: string): string[] {
   return COMMERCIAL_KEYWORDS.filter(signal => norm.includes(signal));
 }
 
+/** Señales informacionales - el usuario quiere aprender */
+const INFORMATIONAL_SIGNALS: string[] = [
+  'que es', 'que son', 'como es', 'como se hace', 'como funciona', 'como se pone',
+  'cuanto dura', 'cuanto tiempo', 'cuanto tarda', 'cuando', 'para que sirve',
+  'tipos de', 'tipo de', 'diferencia entre', 'diferencias', 'ventajas', 'desventajas',
+  'proceso', 'recuperacion', 'postoperatorio', 'antes y despues', 'resultados',
+  'dolor', 'duele', 'sintomas', 'causas', 'riesgos', 'contraindicaciones',
+  'guia', 'consejos', 'informacion', 'explicacion', 'que incluye',
+];
+
+/** Señales transaccionales - el usuario quiere actuar/contratar */
+const TRANSACTIONAL_SIGNALS: string[] = [
+  'pedir cita', 'cita', 'reservar', 'reserva', 'contratar', 'llamar',
+  'urgencias', 'urgente', 'urgencia', 'emergencia', 'hoy mismo', 'ahora mismo',
+  'clinica', 'dentista', 'especialista', 'doctor', 'medico',
+];
+
+/** Señales comerciales/investigación - el usuario compara antes de comprar */
+const COMMERCIAL_INVESTIGATION: string[] = [
+  'precio', 'precios', 'cuanto cuesta', 'cuanto vale', 'coste', 'tarifa',
+  'financiacion', 'a plazos', 'sin intereses', 'cuotas',
+  'mejor', 'mejores', 'top', 'comparar', 'comparativa',
+  'opiniones', 'valoraciones', 'reviews', 'resenas',
+  'barato', 'economico', 'oferta', 'descuento', 'promocion',
+];
+
 /**
- * Detecta intención completa (local + comercial)
+ * Detecta el tipo de intención SEO principal de una keyword
+ */
+export function detectIntentType(
+  keyword: string,
+  hasLocalIntent: boolean,
+  hasCommercialIntent: boolean
+): IntentType {
+  const norm = normalize(keyword);
+
+  // 1. Informacional - el usuario quiere aprender
+  if (INFORMATIONAL_SIGNALS.some(s => norm.includes(s))) return 'informacional';
+
+  // 2. Comercial - el usuario está comparando o investigando precios
+  if (COMMERCIAL_INVESTIGATION.some(s => norm.includes(s))) return 'comercial';
+
+  // 3. Transaccional - el usuario quiere actuar
+  if (TRANSACTIONAL_SIGNALS.some(s => norm.includes(s))) return 'transaccional';
+
+  // 4. Local - tiene intención geográfica clara (service + location)
+  if (hasLocalIntent && (hasLocalIntent)) return 'local';
+
+  return 'general';
+}
+
+/**
+ * Detecta intención completa (local + comercial + tipo)
  */
 export function detectIntent(keyword: string): Intent {
   const localInfo = detectLocalInfo(keyword);
   const commercialSignals = detectCommercialSignals(keyword);
+  const hasCommercialIntent = commercialSignals.length > 0;
+  const hasLocalIntent = localInfo.level !== 'none';
+  const intentType = detectIntentType(keyword, hasLocalIntent, hasCommercialIntent);
 
   const intent: Intent = {
-    hasLocalIntent: localInfo.level !== 'none',
+    hasLocalIntent,
     localLevel: localInfo.level,
     city: localInfo.city,
     neighborhood: localInfo.neighborhood,
     region: localInfo.region,
     localScore: localInfo.localScore,
-    hasCommercialIntent: commercialSignals.length > 0,
+    hasCommercialIntent,
     commercialSignals,
+    intentType,
   };
 
   logger.debug(`Intent detected for "${keyword}"`, {

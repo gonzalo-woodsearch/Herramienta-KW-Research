@@ -12,6 +12,8 @@ export interface LocalInfo {
   localScore: number; // 0-5
 }
 
+export type IntentType = 'transaccional' | 'informacional' | 'comercial' | 'local' | 'general';
+
 export interface Intent {
   hasLocalIntent: boolean;
   localLevel: LocalLevel;
@@ -21,6 +23,7 @@ export interface Intent {
   localScore: number;
   hasCommercialIntent: boolean;
   commercialSignals: string[];
+  intentType: IntentType;
 }
 
 export interface TreatmentClassification {
