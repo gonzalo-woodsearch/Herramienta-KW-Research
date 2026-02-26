@@ -3,6 +3,8 @@
 import { useState, useMemo } from 'react';
 import styles from './page.module.css';
 
+type LocalLevel = 'none' | 'national' | 'regional' | 'city' | 'neighborhood' | 'ultralocal';
+
 interface Keyword {
   keyword: string;
   position?: number;
@@ -11,7 +13,11 @@ interface Keyword {
   url: string;
   treatment?: string | null;
   hasLocalIntent?: boolean;
+  localLevel?: LocalLevel;
   city?: string;
+  neighborhood?: string;
+  region?: string;
+  localScore?: number;
   hasCommercialIntent?: boolean;
   score?: number;
 }
@@ -42,6 +48,15 @@ function getPositionClass(pos?: number): string {
   return 'posRed';
 }
 
+const LOCAL_LEVEL_LABELS: Record<LocalLevel, { label: string; emoji: string; cls: string }> = {
+  ultralocal: { label: 'Ultra-local', emoji: '🎯', cls: 'localUltra' },
+  neighborhood: { label: 'Barrio',     emoji: '🏘️', cls: 'localHood'  },
+  city:         { label: 'Ciudad',     emoji: '🏙️', cls: 'localCity'  },
+  regional:     { label: 'Regional',   emoji: '🗺️', cls: 'localReg'   },
+  national:     { label: 'Nacional',   emoji: '📍', cls: 'localNat'   },
+  none:         { label: '',           emoji: '',   cls: ''            },
+};
+
 function getScoreColor(score?: number): string {
   if (!score) return '#e5e7eb';
   if (score >= 80) return '#10b981';
@@ -71,7 +86,7 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [result, setResult] = useState<AnalysisResult | null>(null);
-  const [activeTab, setActiveTab] = useState<'keywords' | 'clusters'>('keywords');
+  const [activeTab, setActiveTab] = useState<'keywords' | 'clusters' | 'local'>('keywords');
   const [filterTreatment, setFilterTreatment] = useState('all');
   const [sortBy, setSortBy] = useState<'score' | 'traffic' | 'position'>('score');
 
@@ -212,6 +227,12 @@ export default function Home() {
               >
                 🏥 Por tratamiento ({result.clusters.length})
               </button>
+              <button
+                className={activeTab === 'local' ? styles.tabActive : styles.tab}
+                onClick={() => setActiveTab('local')}
+              >
+                📍 Intención local ({result.keywords.filter(k => k.hasLocalIntent).length})
+              </button>
             </div>
 
             {activeTab === 'keywords' && (
@@ -251,6 +272,7 @@ export default function Home() {
                         <th>Tráfico</th>
                         <th>Volumen</th>
                         <th>Tratamiento</th>
+                        <th>Localidad</th>
                         <th>Intención</th>
                         <th>Score</th>
                       </tr>
@@ -276,9 +298,19 @@ export default function Home() {
                               : <span className={styles.unclsBadge}>sin clasificar</span>
                             }
                           </td>
+                          <td>
+                            {kw.localLevel && kw.localLevel !== 'none' && (() => {
+                              const lvl = LOCAL_LEVEL_LABELS[kw.localLevel];
+                              const place = kw.neighborhood || kw.city || kw.region;
+                              return (
+                                <span className={`${styles.localLevelBadge} ${styles[lvl.cls]}`}>
+                                  {lvl.emoji} {place || lvl.label}
+                                </span>
+                              );
+                            })()}
+                          </td>
                           <td className={styles.intentCell}>
-                            {kw.hasLocalIntent && <span className={styles.localBadge}>📍 {kw.city || 'Local'}</span>}
-                            {kw.hasCommercialIntent && <span className={styles.commBadge}>💰</span>}
+                            {kw.hasCommercialIntent && <span className={styles.commBadge}>💰 comercial</span>}
                           </td>
                           <td className={styles.scoreCell}>
                             <div className={styles.scoreBar}>
@@ -334,6 +366,102 @@ export default function Home() {
                 ))}
               </div>
             )}
+
+            {activeTab === 'local' && (() => {
+              const localKws = result.keywords
+                .filter(k => k.hasLocalIntent)
+                .sort((a, b) => (b.localScore || 0) - (a.localScore || 0) || (b.score || 0) - (a.score || 0));
+
+              const levelGroups: Record<string, typeof localKws> = {
+                ultralocal: localKws.filter(k => k.localLevel === 'ultralocal'),
+                neighborhood: localKws.filter(k => k.localLevel === 'neighborhood'),
+                city: localKws.filter(k => k.localLevel === 'city'),
+                regional: localKws.filter(k => k.localLevel === 'regional'),
+                national: localKws.filter(k => k.localLevel === 'national'),
+              };
+
+              return (
+                <div>
+                  <div className={styles.localLegend}>
+                    {Object.entries(LOCAL_LEVEL_LABELS).filter(([k]) => k !== 'none').map(([key, info]) => {
+                      const count = levelGroups[key]?.length || 0;
+                      return count > 0 ? (
+                        <span key={key} className={`${styles.localLevelBadge} ${styles[info.cls]}`}>
+                          {info.emoji} {info.label}: {count}
+                        </span>
+                      ) : null;
+                    })}
+                  </div>
+                  <div className={styles.card}>
+                    <div className={styles.tableWrapper}>
+                      <table className={styles.table}>
+                        <thead>
+                          <tr>
+                            <th className={styles.thNum}>#</th>
+                            <th>Keyword</th>
+                            <th>Nivel</th>
+                            <th>Lugar</th>
+                            <th>Pos.</th>
+                            <th>Tráfico</th>
+                            <th>Tratamiento</th>
+                            <th>Score</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {localKws.map((kw, idx) => {
+                            const lvl = kw.localLevel ? LOCAL_LEVEL_LABELS[kw.localLevel] : null;
+                            const place = kw.neighborhood || kw.city || kw.region || '';
+                            return (
+                              <tr key={idx} className={styles.tableRow}>
+                                <td className={styles.rowNum}>{idx + 1}</td>
+                                <td className={styles.kwCell}>
+                                  <div className={styles.kwText}>{kw.keyword}</div>
+                                  <div className={styles.kwUrl}>{kw.url}</div>
+                                </td>
+                                <td>
+                                  {lvl && lvl.cls && (
+                                    <span className={`${styles.localLevelBadge} ${styles[lvl.cls]}`}>
+                                      {lvl.emoji} {lvl.label}
+                                    </span>
+                                  )}
+                                </td>
+                                <td className={styles.numCell} style={{ fontWeight: 600, color: '#1e293b' }}>
+                                  {place || '—'}
+                                </td>
+                                <td>
+                                  <span className={`${styles.posBadge} ${styles[getPositionClass(kw.position)]}`}>
+                                    #{kw.position || '?'}
+                                  </span>
+                                </td>
+                                <td className={styles.numCell}>{(kw.traffic || 0).toLocaleString()}</td>
+                                <td>
+                                  {kw.treatment
+                                    ? <span className={styles.treatBadge}>{kw.treatment}</span>
+                                    : <span className={styles.unclsBadge}>—</span>
+                                  }
+                                </td>
+                                <td className={styles.scoreCell}>
+                                  <div className={styles.scoreBar}>
+                                    <div
+                                      className={styles.scoreBarFill}
+                                      style={{ width: `${kw.score || 0}%`, background: getScoreColor(kw.score) }}
+                                    />
+                                  </div>
+                                  <span className={styles.scoreNum}>{kw.score || 0}</span>
+                                </td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                    </div>
+                    <div className={styles.tableFooter}>
+                      {localKws.length} keywords con intención local detectada
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
           </>
         )}
       </main>

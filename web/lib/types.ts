@@ -23,8 +23,12 @@ export interface Keyword {
   // Clustering
   treatment?: string | null;
   hasLocalIntent?: boolean;
-  hasCommercialIntent?: boolean;
+  localLevel?: string;
   city?: string;
+  neighborhood?: string;
+  region?: string;
+  localScore?: number;
+  hasCommercialIntent?: boolean;
   commercialSignals?: string[];
 
   // Scoring

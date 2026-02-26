@@ -65,7 +65,9 @@ function scoreCompetition(competition: string | undefined): number {
  */
 export function calculateScore(kw: Keyword): { score: number; breakdown: ScoreBreakdown } {
   // Componentes positivos
-  const volumeScore = scoreVolume(kw.avgMonthlySearches || kw.ahrefsVolume);
+  // Usar volumen de búsquedas; si no hay, estimar desde tráfico (tráfico × ~10 = volumen aprox)
+  const volume = kw.avgMonthlySearches || kw.ahrefsVolume || (kw.traffic ? kw.traffic * 10 : 0);
+  const volumeScore = scoreVolume(volume);
   const cpcScore = scoreCpc(kw.cpcMicros);
 
   // Componentes negativos (penalizaciones)

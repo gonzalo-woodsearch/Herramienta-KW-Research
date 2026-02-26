@@ -335,6 +335,35 @@
 .clusterKwName { flex: 1; color: #374151; font-weight: 500; }
 .clusterKwTraffic { color: #94a3b8; font-size: 0.75rem; }
 
+/* LOCAL LEVEL BADGES */
+.localLevelBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 9999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.localUltra { background: #fdf2f8; color: #a21caf; border: 1px solid #f0abfc; }
+.localHood  { background: #eff6ff; color: #1d4ed8; border: 1px solid #93c5fd; }
+.localCity  { background: #f0fdf4; color: #15803d; border: 1px solid #86efac; }
+.localReg   { background: #fff7ed; color: #c2410c; border: 1px solid #fdba74; }
+.localNat   { background: #f8fafc; color: #475569; border: 1px solid #cbd5e1; }
+
+/* LOCAL LEGEND BAR */
+.localLegend {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+  padding: 0.75rem 1rem;
+  background: white;
+  border-radius: 0.75rem;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+}
+
 /* RESPONSIVE */
 @media (max-width: 900px) {
   .statsGrid { grid-template-columns: repeat(2, 1fr); }
