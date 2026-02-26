@@ -211,23 +211,30 @@ export default function Home() {
 
         {/* HERO: pantalla de inicio sin resultados */}
         {!result && !loading && (
-          <div className={styles.hero}>
-            <div className={styles.heroBadge}>🇪🇸 Especializada en el mercado español</div>
-            <div className={styles.heroLogo}>🦷</div>
-            <h1 className={styles.heroTitle}>KW ReWoodSearch</h1>
-            <p className={styles.heroSubtitle}>
-              Mejor herramienta de análisis de keywords de España
-            </p>
-            <div className={styles.heroCard}>
-              {searchForm(false)}
+          <>
+            {/* Fondo animado */}
+            <div className={styles.heroBg} aria-hidden="true">
+              <div className={styles.heroBlob1} />
+              <div className={styles.heroBlob2} />
+              <div className={styles.heroBlob3} />
+              <div className={styles.heroGrid} />
             </div>
-            <div className={styles.heroFeatures}>
-              <span className={styles.heroFeature}><span>📍</span> Intención ultra-local</span>
-              <span className={styles.heroFeature}><span>🏥</span> Clasificación dental</span>
-              <span className={styles.heroFeature}><span>📊</span> Scoring 0–100</span>
-              <span className={styles.heroFeature}><span>⬇️</span> Export CSV</span>
+
+            <div className={styles.hero}>
+              <div className={styles.heroBadge}>
+                <span className={styles.heroBadgeDot} />
+                Especializada en el mercado español
+              </div>
+              <div className={styles.heroLogo}>🦷</div>
+              <h1 className={styles.heroTitle}>KW ReWoodSearch</h1>
+              <p className={styles.heroSubtitle}>
+                Descubre las keywords con más potencial de cualquier web dental en España
+              </p>
+              <div className={styles.heroCard}>
+                {searchForm(false)}
+              </div>
             </div>
-          </div>
+          </>
         )}
 
         {/* Búsqueda compacta cuando hay resultados */}
