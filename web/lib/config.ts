@@ -4,6 +4,11 @@
  */
 
 export interface Config {
+  dataforseo: {
+    login: string;
+    password: string;
+    cacheTtl: number;
+  };
   ahrefs: {
     apiKey: string;
     rateLimit: number;
@@ -49,6 +54,11 @@ function getEnvNumber(key: string, defaultValue: number): number {
 
 export function loadConfig(): Config {
   return {
+    dataforseo: {
+      login: getEnvVar('DATAFORSEO_LOGIN'),
+      password: getEnvVar('DATAFORSEO_PASSWORD'),
+      cacheTtl: getEnvNumber('CACHE_TTL_DATAFORSEO', 86400), // 24h
+    },
     ahrefs: {
       apiKey: getEnvVar('AHREFS_API_KEY'),
       rateLimit: getEnvNumber('AHREFS_RATE_LIMIT', 10),

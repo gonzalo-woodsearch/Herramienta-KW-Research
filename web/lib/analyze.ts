@@ -6,7 +6,7 @@
 import { Keyword, ClusteredKeywords } from './types';
 
 // Import core services
-import { organicKeywordsService } from './api/ahrefs/organic-keywords';
+import { rankedKeywordsService } from './api/dataforseo/ranked-keywords';
 import { deduplicate } from './analysis/clustering/normalizer';
 import { detectTreatment } from './analysis/clustering/dental-classifier';
 import { detectIntent } from './analysis/clustering/intent-detector';
@@ -44,9 +44,9 @@ export async function analyzeUrl(request: AnalysisRequest): Promise<AnalysisResu
 
   console.log(`[Analysis] Starting analysis for ${url}`);
 
-  // Step 1: Fetch organic keywords from Ahrefs
-  console.log('[Analysis] Step 1/5: Fetching keywords from Ahrefs...');
-  const ahrefsKeywords = await organicKeywordsService.getOrganicKeywords(url, country, limit);
+  // Step 1: Fetch organic keywords from DataForSEO
+  console.log('[Analysis] Step 1/5: Fetching keywords from DataForSEO...');
+  const ahrefsKeywords = await rankedKeywordsService.getRankedKeywords(url, country, limit);
   console.log(`[Analysis] Fetched ${ahrefsKeywords.length} keywords`);
 
   // Step 2: Normalize and deduplicate
