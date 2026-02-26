@@ -4,7 +4,6 @@
  */
 
 import { mkdir } from 'fs/promises';
-import { dirname } from 'path';
 import { Keyword, UrlCommandOptions, ReportMetadata } from '../../types.js';
 import { organicKeywordsService } from '../../api/ahrefs/organic-keywords.js';
 import { keywordPlannerService } from '../../api/google-ads/keyword-planner.js';

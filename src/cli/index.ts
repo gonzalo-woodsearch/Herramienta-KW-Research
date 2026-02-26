@@ -33,7 +33,7 @@ program
         url: options.url,
         country: options.country || 'ES',
         lang: options.lang || 'es',
-        limit: parseInt(options.limit || '100', 10),
+        limit: parseInt(String(options.limit || '100'), 10),
         out: options.out || './output',
       };
 

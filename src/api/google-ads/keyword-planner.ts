@@ -5,7 +5,6 @@
 import GoogleAdsClient from './client.js';
 import {
   KeywordMetrics,
-  GoogleAdsHistoricalMetricsRequest,
   GoogleAdsKeywordIdea,
   GEO_TARGETS,
   LANGUAGES,
@@ -41,14 +40,18 @@ export class KeywordPlannerService {
         logger.debug(`Fetching Google Ads metrics for ${keywords.length} keywords`);
 
         try {
+          // @ts-ignore - Google Ads API v23 interface compatibility
           const response = await customer.keywordPlanIdeas.generateKeywordIdeas({
+            customer_id: config.googleAds.customerId,
             keyword_seed: {
               keywords,
             },
             geo_target_constants: [geoTarget],
             language: language,
             include_adult_keywords: false,
-          });
+            keyword_plan_network: 2, // GOOGLE_SEARCH_AND_PARTNERS
+            page_size: keywords.length,
+          } as any);
 
           const metrics: KeywordMetrics[] = [];
 

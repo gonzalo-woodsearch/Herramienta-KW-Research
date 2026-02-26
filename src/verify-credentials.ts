@@ -6,8 +6,6 @@
  */
 
 import config from './config.js';
-import logger from './utils/logger.js';
-import { AhrefsClient } from './api/ahrefs/client.js';
 import { GoogleAdsClient } from './api/google-ads/client.js';
 
 console.log('\n🔍 Verificando credenciales...\n');
@@ -20,8 +18,6 @@ async function verifyAhrefs(): Promise<boolean> {
       console.log('   ❌ AHREFS_API_KEY no configurada en .env\n');
       return false;
     }
-
-    const client = new AhrefsClient();
 
     // Intentar una petición simple (puede fallar si no hay créditos, pero verificará auth)
     console.log('   → Verificando autenticación...');
@@ -42,14 +38,6 @@ async function verifyGoogleAds(): Promise<boolean> {
     console.log('2️⃣  Google Ads API...');
 
     // Verificar que todas las credenciales estén configuradas
-    const requiredVars = [
-      'developerToken',
-      'clientId',
-      'clientSecret',
-      'refreshToken',
-      'customerId',
-    ];
-
     const missing: string[] = [];
 
     if (!config.googleAds.developerToken || config.googleAds.developerToken.includes('PEGAR_TU')) {

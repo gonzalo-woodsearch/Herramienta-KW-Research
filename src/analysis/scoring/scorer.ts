@@ -6,13 +6,7 @@ import { Keyword, ScoreBreakdown } from '../../types.js';
 import { calculateBoosts } from './boosts.js';
 import logger from '../../utils/logger.js';
 
-const WEIGHTS = {
-  volume: 0.4, // 40%
-  cpc: 0.2, // 20%
-  kd: 0.3, // 30% (resta)
-  competition: 0.1, // 10% (resta)
-};
-
+// Scoring weights: volume(40%), cpc(20%), kd(30%), competition(10%)
 const LIMITS = {
   maxVolume: 10000, // búsquedas/mes
   maxCpcEuros: 5, // euros
