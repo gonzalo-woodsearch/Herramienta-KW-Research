@@ -2,6 +2,46 @@
 
 Herramienta profesional de investigación de keywords para clínicas dentales en España que combina **Ahrefs API v3** + **Google Ads API** para obtener datos reales de keywords orgánicas y métricas de búsqueda.
 
+## 🎬 Demo Interactiva
+
+👉 **[Ver Demo en Vivo](https://gonzalo-woodsearch.github.io/Herramienta-KW-Research/)** - Prueba la herramienta sin instalar nada
+
+## ⚡ Quick Start (Solo Ahrefs)
+
+Puedes empezar a usar la herramienta **solo con Ahrefs API** (Google Ads es opcional):
+
+```bash
+# 1. Clonar el repositorio
+git clone https://github.com/gonzalo-woodsearch/Herramienta-KW-Research.git
+cd Herramienta-KW-Research
+
+# 2. Instalar dependencias
+npm install
+
+# 3. Configurar solo Ahrefs API key
+# Edita el archivo .env y añade:
+AHREFS_API_KEY=tu_api_key_aqui
+
+# 4. Compilar
+npm run build
+
+# 5. Probar con una URL
+npm start -- url --url https://clinica.com/implantes --limit 30
+```
+
+**Resultado:** Obtendrás keywords, posiciones, clasificación por tratamientos, intención local/comercial y scoring básico.
+
+### 💻 Nota para Windows
+
+Si `npm` no está en el PATH, usa PowerShell y ejecuta:
+
+```powershell
+$env:Path = "C:\Program Files\nodejs;" + $env:Path
+npm install
+npm run build
+npm start -- url --url https://clinica.com/implantes --limit 30
+```
+
 ## 🎯 Features
 
 - ✅ **NO scraping** - Usa APIs oficiales exclusivamente
