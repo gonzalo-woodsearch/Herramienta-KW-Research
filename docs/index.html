@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KW Research Dental - Demo Interactiva</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @keyframes typing {
+            from { width: 0 }
+            to { width: 100% }
+        }
+        .typing-line {
+            overflow: hidden;
+            white-space: nowrap;
+            border-right: 2px solid #22c55e;
+            animation: typing 0.5s steps(40) forwards;
+        }
+        @keyframes blink {
+            50% { border-color: transparent }
+        }
+        .typing-line.done {
+            border-right-color: transparent;
+        }
+        .score-85 { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
+        .score-75 { background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); }
+        .score-65 { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); }
+        .score-50 { background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans">
+    <!-- Header -->
+    <div class="bg-gradient-to-r from-blue-600 to-purple-600 text-white">
+        <div class="container mx-auto px-4 py-8">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-3xl font-bold mb-2">🦷 KW Research Dental</h1>
+                    <p class="text-blue-100">Herramienta profesional de análisis de keywords para clínicas dentales en España</p>
+                </div>
+                <a href="https://github.com/gonzalo-woodsearch/Herramienta-KW-Research" target="_blank"
+                   class="bg-white text-blue-600 px-6 py-3 rounded-lg font-semibold hover:bg-blue-50 transition">
+                    Ver en GitHub →
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="bg-white border-b border-gray-200 sticky top-0 z-10 shadow-sm">
+        <div class="container mx-auto px-4">
+            <div class="flex gap-1">
+                <button onclick="showTab('demo')" id="tab-demo" class="tab-btn active px-6 py-3 font-semibold border-b-2 border-blue-600 text-blue-600">
+                    🎬 Demo Interactiva
+                </button>
+                <button onclick="showTab('resultados')" id="tab-resultados" class="tab-btn px-6 py-3 font-semibold border-b-2 border-transparent text-gray-600 hover:text-gray-900">
+                    📊 Resultados
+                </button>
+                <button onclick="showTab('features')" id="tab-features" class="tab-btn px-6 py-3 font-semibold border-b-2 border-transparent text-gray-600 hover:text-gray-900">
+                    ✨ Características
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="container mx-auto px-4 py-8">
+
+        <!-- TAB: Demo Interactiva -->
+        <div id="content-demo" class="tab-content">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+                <!-- Panel izquierdo: Simulador CLI -->
+                <div>
+                    <div class="bg-gray-900 rounded-lg shadow-xl overflow-hidden">
+                        <div class="bg-gray-800 px-4 py-2 flex items-center gap-2">
+                            <div class="w-3 h-3 rounded-full bg-red-500"></div>
+                            <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
+                            <div class="w-3 h-3 rounded-full bg-green-500"></div>
+                            <span class="ml-2 text-gray-400 text-sm font-mono">kwtool</span>
+                        </div>
+                        <div id="terminal" class="p-4 text-sm font-mono h-96 overflow-y-auto">
+                            <!-- Se llenará con JavaScript -->
+                        </div>
+                    </div>
+
+                    <div class="mt-4 bg-white rounded-lg shadow-md p-4">
+                        <h3 class="font-bold text-gray-800 mb-3">🎮 Prueba la herramienta</h3>
+                        <div class="space-y-3">
+                            <div>
+                                <label class="text-sm font-medium text-gray-700 block mb-1">URL a analizar:</label>
+                                <input type="text" id="input-url" value="https://example.com/implantes-dentales"
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
+                            </div>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="text-sm font-medium text-gray-700 block mb-1">País:</label>
+                                    <select id="input-country" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
+                                        <option value="ES">España</option>
+                                        <option value="MX">México</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="text-sm font-medium text-gray-700 block mb-1">Límite:</label>
+                                    <input type="number" id="input-limit" value="30"
+                                           class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
+                                </div>
+                            </div>
+                            <button onclick="runDemo()" id="btn-run"
+                                    class="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-lg font-semibold hover:from-blue-700 hover:to-purple-700 transition">
+                                ▶️ Ejecutar Análisis
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Panel derecho: Vista previa resultados -->
+                <div>
+                    <div class="bg-white rounded-lg shadow-md p-4 mb-4">
+                        <h3 class="font-bold text-gray-800 mb-3">📊 Resumen de Resultados</h3>
+                        <div id="summary" class="grid grid-cols-3 gap-3">
+                            <div class="bg-blue-50 rounded-lg p-3 text-center">
+                                <div class="text-2xl font-bold text-blue-600">30</div>
+                                <div class="text-xs text-blue-800">Keywords</div>
+                            </div>
+                            <div class="bg-green-50 rounded-lg p-3 text-center">
+                                <div class="text-2xl font-bold text-green-600">15</div>
+                                <div class="text-xs text-green-800">Score > 70</div>
+                            </div>
+                            <div class="bg-purple-50 rounded-lg p-3 text-center">
+                                <div class="text-2xl font-bold text-purple-600">12</div>
+                                <div class="text-xs text-purple-800">Clusters</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow-md p-4">
+                        <h3 class="font-bold text-gray-800 mb-3">🎯 Top 5 Oportunidades</h3>
+                        <div id="top-keywords" class="space-y-2">
+                            <!-- Se llenará con JavaScript -->
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow-md p-4 mt-4">
+                        <h3 class="font-bold text-gray-800 mb-3">📁 Outputs Generados</h3>
+                        <div class="space-y-2">
+                            <button onclick="showTab('resultados'); document.getElementById('output-csv').scrollIntoView({behavior: 'smooth'})"
+                                    class="w-full text-left px-4 py-3 bg-gray-50 hover:bg-gray-100 rounded-lg transition flex items-center justify-between">
+                                <span class="text-sm font-medium text-gray-700">📄 keywords.csv</span>
+                                <span class="text-xs text-gray-500">Ver →</span>
+                            </button>
+                            <button onclick="showTab('resultados'); document.getElementById('output-json').scrollIntoView({behavior: 'smooth'})"
+                                    class="w-full text-left px-4 py-3 bg-gray-50 hover:bg-gray-100 rounded-lg transition flex items-center justify-between">
+                                <span class="text-sm font-medium text-gray-700">📊 keywords.json</span>
+                                <span class="text-xs text-gray-500">Ver →</span>
+                            </button>
+                            <button onclick="showTab('resultados'); document.getElementById('output-md').scrollIntoView({behavior: 'smooth'})"
+                                    class="w-full text-left px-4 py-3 bg-gray-50 hover:bg-gray-100 rounded-lg transition flex items-center justify-between">
+                                <span class="text-sm font-medium text-gray-700">📝 report.md</span>
+                                <span class="text-xs text-gray-500">Ver →</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- TAB: Resultados -->
+        <div id="content-resultados" class="tab-content hidden">
+            <div class="space-y-6">
+
+                <!-- CSV Preview -->
+                <div id="output-csv" class="bg-white rounded-lg shadow-md overflow-hidden">
+                    <div class="bg-gradient-to-r from-green-600 to-emerald-600 text-white px-4 py-3">
+                        <h3 class="font-bold">📄 keywords.csv</h3>
+                        <p class="text-sm text-green-100">Abrir en Excel para análisis detallado</p>
+                    </div>
+                    <div class="p-4 overflow-x-auto">
+                        <table class="w-full text-sm">
+                            <thead>
+                                <tr class="bg-gray-50 border-b">
+                                    <th class="px-3 py-2 text-left font-semibold text-gray-700">Keyword</th>
+                                    <th class="px-3 py-2 text-left font-semibold text-gray-700">Volume</th>
+                                    <th class="px-3 py-2 text-left font-semibold text-gray-700">CPC</th>
+                                    <th class="px-3 py-2 text-left font-semibold text-gray-700">Score</th>
+                                    <th class="px-3 py-2 text-left font-semibold text-gray-700">Treatment</th>
+                                    <th class="px-3 py-2 text-left font-semibold text-gray-700">Intent</th>
+                                </tr>
+                            </thead>
+                            <tbody id="csv-table-body">
+                                <!-- Se llenará con JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- JSON Preview -->
+                <div id="output-json" class="bg-white rounded-lg shadow-md overflow-hidden">
+                    <div class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-4 py-3">
+                        <h3 class="font-bold">📊 keywords.json</h3>
+                        <p class="text-sm text-blue-100">Datos estructurados para integraciones</p>
+                    </div>
+                    <div class="p-4">
+                        <pre id="json-content" class="bg-gray-900 text-green-400 p-4 rounded-lg overflow-x-auto text-xs font-mono"></pre>
+                    </div>
+                </div>
+
+                <!-- Markdown Preview -->
+                <div id="output-md" class="bg-white rounded-lg shadow-md overflow-hidden">
+                    <div class="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-4 py-3">
+                        <h3 class="font-bold">📝 report.md</h3>
+                        <p class="text-sm text-purple-100">Reporte legible con análisis y recomendaciones</p>
+                    </div>
+                    <div id="md-content" class="p-6 prose prose-sm max-w-none">
+                        <!-- Se llenará con JavaScript -->
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- TAB: Features -->
+        <div id="content-features" class="tab-content hidden">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <div class="text-4xl mb-3">🔍</div>
+                    <h3 class="text-lg font-bold text-gray-800 mb-2">Ahrefs API v3</h3>
+                    <p class="text-gray-600 text-sm">Obtiene keywords orgánicas reales por las que rankea una URL. Sin scraping, datos oficiales con paginación automática.</p>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <div class="text-4xl mb-3">📊</div>
+                    <h3 class="text-lg font-bold text-gray-800 mb-2">Google Ads API</h3>
+                    <p class="text-gray-600 text-sm">Enriquece con volumen de búsquedas, CPC y nivel de competencia para España. Métricas reales del mercado.</p>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <div class="text-4xl mb-3">🦷</div>
+                    <h3 class="text-lg font-bold text-gray-800 mb-2">Clasificador Dental</h3>
+                    <p class="text-gray-600 text-sm">Detecta automáticamente 12 tratamientos: implantes, ortodoncia, carillas, blanqueamiento, endodoncia, periodoncia y más.</p>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <div class="text-4xl mb-3">📍</div>
+                    <h3 class="text-lg font-bold text-gray-800 mb-2">Detección Local</h3>
+                    <p class="text-gray-600 text-sm">Identifica 50+ ciudades españolas, barrios y patrones locales ("cerca de mí", "zona norte", "24h").</p>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <div class="text-4xl mb-3">💰</div>
+                    <h3 class="text-lg font-bold text-gray-800 mb-2">Intención Comercial</h3>
+                    <p class="text-gray-600 text-sm">Detecta señales de compra: precio, financiación, ofertas, urgencias. Identifica keywords de alta conversión.</p>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <div class="text-4xl mb-3">🎯</div>
+                    <h3 class="text-lg font-bold text-gray-800 mb-2">Scoring Inteligente</h3>
+                    <p class="text-gray-600 text-sm">Sistema 0-100 con boosts: +10 local, +10 tratamientos core, +5 comercial. Prioriza automáticamente las mejores oportunidades.</p>
+                </div>
+
+            </div>
+
+            <div class="bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg shadow-xl p-8 mt-8 text-white text-center">
+                <h2 class="text-2xl font-bold mb-4">¿Listo para usarla?</h2>
+                <p class="mb-6">Configura tus credenciales de Ahrefs y Google Ads y empieza a analizar competidores</p>
+                <div class="flex gap-4 justify-center">
+                    <a href="https://github.com/gonzalo-woodsearch/Herramienta-KW-Research#readme" target="_blank"
+                       class="bg-white text-blue-600 px-6 py-3 rounded-lg font-semibold hover:bg-blue-50 transition">
+                        📖 Documentación
+                    </a>
+                    <a href="https://github.com/gonzalo-woodsearch/Herramienta-KW-Research/blob/master/START_HERE.md" target="_blank"
+                       class="bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-800 transition">
+                        🚀 Empezar
+                    </a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Datos de ejemplo
+        const exampleKeywords = [
+            { keyword: "dentista urgencias madrid 24h", volume: 650, cpc: 4.10, score: 88, treatment: "urgencias", local: true, city: "madrid", commercial: true },
+            { keyword: "implantes dentales madrid", volume: 1500, cpc: 3.20, score: 85, treatment: "implantes", local: true, city: "madrid", commercial: false },
+            { keyword: "implantes dentales precio", volume: 1350, cpc: 3.00, score: 84, treatment: "implantes", local: false, commercial: true },
+            { keyword: "blanqueamiento dental precio", volume: 1200, cpc: 2.20, score: 82, treatment: "blanqueamiento", local: false, commercial: true },
+            { keyword: "implantes all on 4 precio", volume: 450, cpc: 4.20, score: 80, treatment: "implantes", local: false, commercial: true },
+            { keyword: "precio ortodoncia invisible", volume: 890, cpc: 2.80, score: 78, treatment: "ortodoncia", local: false, commercial: true },
+            { keyword: "urgencias dentales fin de semana", volume: 580, cpc: 3.80, score: 78, treatment: "urgencias", local: false, commercial: true },
+            { keyword: "dentista cerca de mi", volume: 1800, cpc: 2.50, score: 78, treatment: null, local: true, commercial: false },
+        ];
+
+        // Tabs
+        function showTab(tab) {
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active', 'border-blue-600', 'text-blue-600');
+                btn.classList.add('border-transparent', 'text-gray-600');
+            });
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.add('hidden');
+            });
+
+            document.getElementById(`tab-${tab}`).classList.add('active', 'border-blue-600', 'text-blue-600');
+            document.getElementById(`content-${tab}`).classList.remove('hidden');
+        }
+
+        // Terminal simulation
+        function runDemo() {
+            const terminal = document.getElementById('terminal');
+            const url = document.getElementById('input-url').value;
+            const country = document.getElementById('input-country').value;
+            const limit = document.getElementById('input-limit').value;
+            const btn = document.getElementById('btn-run');
+
+            btn.disabled = true;
+            btn.textContent = '⏳ Ejecutando...';
+            terminal.innerHTML = '';
+
+            const steps = [
+                { text: `$ npm start -- url --url ${url} --country ${country} --limit ${limit}`, color: 'text-blue-400', delay: 100 },
+                { text: '', color: '', delay: 200 },
+                { text: '🔍 Starting keyword research pipeline', color: 'text-white', delay: 500 },
+                { text: '', color: '', delay: 200 },
+                { text: 'Step 1/6: Fetching organic keywords from Ahrefs...', color: 'text-cyan-400', delay: 800 },
+                { text: '→ Connecting to Ahrefs API v3...', color: 'text-gray-400', delay: 400 },
+                { text: '→ Fetching page 1 (limit: 30)...', color: 'text-gray-400', delay: 600 },
+                { text: `✓ Fetched 30 keywords from Ahrefs`, color: 'text-green-400', delay: 300 },
+                { text: '', color: '', delay: 200 },
+                { text: 'Step 2/6: Normalizing and deduplicating keywords...', color: 'text-cyan-400', delay: 400 },
+                { text: '✓ After deduplication: 30 unique keywords', color: 'text-green-400', delay: 300 },
+                { text: '', color: '', delay: 200 },
+                { text: 'Step 3/6: Enriching with Google Ads metrics...', color: 'text-cyan-400', delay: 800 },
+                { text: '→ Connecting to Google Ads API...', color: 'text-gray-400', delay: 500 },
+                { text: '→ Fetching historical metrics (batch 1/1)...', color: 'text-gray-400', delay: 700 },
+                { text: '✓ Enriched 30 keywords with Google Ads data', color: 'text-green-400', delay: 300 },
+                { text: '', color: '', delay: 200 },
+                { text: 'Step 4/6: Classifying treatments and detecting intent...', color: 'text-cyan-400', delay: 400 },
+                { text: '✓ Classification complete', color: 'text-green-400', delay: 300 },
+                { text: '', color: '', delay: 200 },
+                { text: 'Step 5/6: Calculating scores...', color: 'text-cyan-400', delay: 400 },
+                { text: '→ Average score: 71', color: 'text-gray-400', delay: 200 },
+                { text: '→ High-score keywords (>70): 15 found', color: 'text-gray-400', delay: 200 },
+                { text: '✓ Scoring complete', color: 'text-green-400', delay: 300 },
+                { text: '', color: '', delay: 200 },
+                { text: 'Step 6/6: Clustering by treatment...', color: 'text-cyan-400', delay: 400 },
+                { text: '✓ Created 12 clusters', color: 'text-green-400', delay: 300 },
+                { text: '', color: '', delay: 300 },
+                { text: '✅ Analysis complete!', color: 'text-green-400 font-bold', delay: 500 },
+                { text: '', color: '', delay: 200 },
+                { text: '📊 Results:', color: 'text-yellow-400 font-bold', delay: 200 },
+                { text: '   - Total keywords: 30', color: 'text-white', delay: 100 },
+                { text: '   - High-score keywords (>70): 15', color: 'text-white', delay: 100 },
+                { text: '   - Treatment clusters: 12', color: 'text-white', delay: 100 },
+                { text: '   - Processing time: 45.23s', color: 'text-white', delay: 100 },
+            ];
+
+            let i = 0;
+            function typeStep() {
+                if (i < steps.length) {
+                    const step = steps[i];
+                    const line = document.createElement('div');
+                    line.className = step.color;
+                    line.textContent = step.text;
+                    terminal.appendChild(line);
+                    terminal.scrollTop = terminal.scrollHeight;
+                    i++;
+                    setTimeout(typeStep, step.delay);
+                } else {
+                    btn.disabled = false;
+                    btn.textContent = '▶️ Ejecutar Análisis';
+                    renderResults();
+                }
+            }
+            typeStep();
+        }
+
+        // Render results
+        function renderResults() {
+            // Top keywords
+            const topContainer = document.getElementById('top-keywords');
+            topContainer.innerHTML = exampleKeywords.slice(0, 5).map((kw, i) => {
+                const scoreClass = kw.score >= 85 ? 'score-85' : kw.score >= 75 ? 'score-75' : kw.score >= 65 ? 'score-65' : 'score-50';
+                const intent = [];
+                if (kw.local && kw.city) intent.push(`📍 ${kw.city}`);
+                if (kw.commercial) intent.push('💰 Comercial');
+                return `
+                    <div class="border border-gray-200 rounded-lg p-3 hover:shadow-md transition">
+                        <div class="flex items-start justify-between mb-2">
+                            <div class="flex-1">
+                                <div class="text-sm font-semibold text-gray-800">${kw.keyword}</div>
+                                <div class="text-xs text-gray-500 mt-1">${kw.volume.toLocaleString()} búsquedas/mes · ${kw.cpc.toFixed(2)}€ CPC</div>
+                            </div>
+                            <div class="${scoreClass} text-white px-3 py-1 rounded-full text-sm font-bold">${kw.score}</div>
+                        </div>
+                        <div class="flex gap-2 flex-wrap">
+                            ${kw.treatment ? `<span class="text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full">${kw.treatment}</span>` : ''}
+                            ${intent.map(i => `<span class="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">${i}</span>`).join('')}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            // CSV Table
+            const csvTable = document.getElementById('csv-table-body');
+            csvTable.innerHTML = exampleKeywords.map(kw => {
+                const intent = [];
+                if (kw.local && kw.city) intent.push(`Local (${kw.city})`);
+                if (kw.commercial) intent.push('Comercial');
+                return `
+                    <tr class="border-b hover:bg-gray-50">
+                        <td class="px-3 py-2">${kw.keyword}</td>
+                        <td class="px-3 py-2">${kw.volume.toLocaleString()}</td>
+                        <td class="px-3 py-2">${kw.cpc.toFixed(2)}€</td>
+                        <td class="px-3 py-2"><span class="font-bold text-${kw.score >= 80 ? 'green' : kw.score >= 70 ? 'blue' : 'orange'}-600">${kw.score}</span></td>
+                        <td class="px-3 py-2">${kw.treatment || 'N/A'}</td>
+                        <td class="px-3 py-2"><span class="text-xs">${intent.join(' + ') || 'N/A'}</span></td>
+                    </tr>
+                `;
+            }).join('');
+
+            // JSON
+            const jsonContent = document.getElementById('json-content');
+            jsonContent.textContent = JSON.stringify({
+                metadata: {
+                    url: "https://example.com/implantes-dentales",
+                    country: "ES",
+                    timestamp: new Date().toISOString(),
+                    totalKeywords: 30
+                },
+                keywords: exampleKeywords.slice(0, 3),
+                clusters: [
+                    { treatment: "urgencias", count: 2, avgScore: 83, totalVolume: 1230 },
+                    { treatment: "implantes", count: 7, avgScore: 78, totalVolume: 4710 },
+                    { treatment: "ortodoncia", count: 5, avgScore: 72, totalVolume: 3020 }
+                ]
+            }, null, 2);
+
+            // Markdown
+            const mdContent = document.getElementById('md-content');
+            mdContent.innerHTML = `
+                <h1>Keyword Research Report</h1>
+                <p><strong>URL:</strong> https://example.com/implantes-dentales</p>
+                <p><strong>Total Keywords:</strong> 30 | <strong>Processing Time:</strong> 45.23s</p>
+
+                <h2>🎯 Top Opportunities (Score &gt; 70)</h2>
+                <table>
+                    <thead>
+                        <tr><th>Keyword</th><th>Volume</th><th>Score</th><th>Treatment</th></tr>
+                    </thead>
+                    <tbody>
+                        ${exampleKeywords.slice(0, 5).map(kw => `
+                            <tr>
+                                <td>${kw.keyword}</td>
+                                <td>${kw.volume.toLocaleString()}</td>
+                                <td><strong>${kw.score}</strong></td>
+                                <td>${kw.treatment || 'N/A'}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+
+                <h2>📊 Clusters by Treatment</h2>
+                <h3>Implantes (7 keywords, avg score: 78)</h3>
+                <p>Total Volume: 4,710 | Core Treatment ⭐</p>
+                <ul>
+                    <li>implantes dentales madrid (Score: 85, Volume: 1500)</li>
+                    <li>implantes dentales precio (Score: 84, Volume: 1350)</li>
+                </ul>
+
+                <h2>💡 Recommendations</h2>
+                <ul>
+                    <li>Focus on local SEO: 11 keywords with city targeting</li>
+                    <li>Core treatments: 12 keywords for implantes/ortodoncia</li>
+                    <li>Priority: Urgencias 24h Madrid (Score 88)</li>
+                </ul>
+            `;
+        }
+
+        // Auto-run on load
+        window.addEventListener('load', () => {
+            setTimeout(runDemo, 500);
+        });
+    </script>
+</body>
+</html>
