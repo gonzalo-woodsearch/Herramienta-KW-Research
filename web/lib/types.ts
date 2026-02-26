@@ -17,6 +17,9 @@ export interface Keyword {
   competition?: 'LOW' | 'MEDIUM' | 'HIGH';
   cpcMicros?: number;
 
+  // URL filtering
+  isTargetPage?: boolean;
+
   // Keyword Difficulty (opcional, de Ahrefs Keywords Explorer)
   keywordDifficulty?: number;
 

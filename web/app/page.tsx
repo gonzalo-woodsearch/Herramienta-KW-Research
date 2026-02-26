@@ -12,6 +12,7 @@ interface Keyword {
   traffic?: number;
   ahrefsVolume?: number;
   url: string;
+  isTargetPage?: boolean;
   treatment?: string | null;
   hasLocalIntent?: boolean;
   localLevel?: LocalLevel;
@@ -75,18 +76,81 @@ function getScoreColor(score?: number): string {
   return '#ef4444';
 }
 
-function exportCSV(keywords: Keyword[], domain: string) {
-  const headers = ['Keyword', 'Posicion', 'Trafico', 'Volumen', 'Tratamiento', 'Local', 'Ciudad', 'Comercial', 'Score', 'URL'];
-  const rows = keywords.map(kw => [
-    kw.keyword, kw.position || '', kw.traffic || 0, kw.ahrefsVolume || 0,
-    kw.treatment || 'sin clasificar', kw.hasLocalIntent ? 'Si' : 'No',
-    kw.city || '', kw.hasCommercialIntent ? 'Si' : 'No', kw.score || 0, kw.url,
-  ]);
-  const csv = [headers, ...rows].map(r => r.map(v => `"${v}"`).join(',')).join('\n');
-  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+function exportExcel(keywords: Keyword[], domain: string, targetUrl: string) {
+  const date = new Date().toISOString().split('T')[0];
+  const intentColors: Record<string, string> = {
+    transaccional: '#dcfce7', informacional: '#dbeafe',
+    comercial: '#ffedd5', local: '#f3e8ff', general: '#f1f5f9',
+  };
+  const totalKws = keywords.length;
+  const highScore = keywords.filter(k => (k.score || 0) > 70).length;
+  const localKws = keywords.filter(k => k.hasLocalIntent).length;
+  const targetKws = keywords.filter(k => k.isTargetPage !== false).length;
+
+  const rows = keywords.map((kw, i) => {
+    const ibg = intentColors[kw.intentType || 'general'] || '#f1f5f9';
+    const s = kw.score || 0;
+    const sbg = s >= 80 ? '#dcfce7' : s >= 60 ? '#dbeafe' : s >= 40 ? '#fef9c3' : '#fee2e2';
+    const place = kw.neighborhood || kw.city || kw.region || '';
+    const kwSafe = kw.keyword.replace(/&/g, '&amp;').replace(/</g, '&lt;');
+    const urlSafe = kw.url.replace(/&/g, '&amp;');
+    return `<tr>
+      <td style="text-align:center;color:#94a3b8;background:#fafafa">${i + 1}</td>
+      <td style="font-weight:600;min-width:200px">${kwSafe}</td>
+      <td style="text-align:center;font-weight:700">${kw.position || '—'}</td>
+      <td style="text-align:right">${(kw.traffic || 0).toLocaleString()}</td>
+      <td style="text-align:right">${(kw.ahrefsVolume || 0).toLocaleString()}</td>
+      <td style="background:${ibg};text-align:center;font-weight:600">${kw.intentType || 'general'}</td>
+      <td style="font-weight:500">${kw.treatment || '—'}</td>
+      <td>${place || '—'}</td>
+      <td style="background:${sbg};text-align:center;font-weight:700">${s}</td>
+      <td style="color:#64748b;font-size:11px;max-width:220px;word-break:break-all">${urlSafe}</td>
+      <td style="text-align:center;font-weight:700;color:#4f46e5">${kw.isTargetPage !== false ? '✓' : ''}</td>
+    </tr>`;
+  }).join('');
+
+  const html = `<html><head><meta charset="UTF-8"><style>
+    body { font-family: Calibri, Arial, sans-serif; font-size: 12px; }
+    table { border-collapse: collapse; width: 100%; }
+    td, th { border: 1px solid #e2e8f0; padding: 6px 10px; vertical-align: middle; }
+    th { background: #1e1b4b; color: white; font-weight: 600; text-align: left; }
+    tr:nth-child(even) td { background-color: #fafafa; }
+    tr:hover td { background-color: #f0f4ff !important; }
+  </style></head><body><table>
+    <tr><td colspan="11" style="background:#1e1b4b;color:white;font-size:18px;font-weight:800;padding:14px 12px;border:none;letter-spacing:-0.02em">🦷 KW ReWoodSearch — Análisis de Keywords</td></tr>
+    <tr>
+      <td colspan="4" style="background:#f8fafc;font-weight:600;color:#374151">Dominio: ${domain}</td>
+      <td colspan="4" style="background:#f8fafc;font-weight:600;color:#374151">URL analizada: ${targetUrl.replace(/&/g, '&amp;')}</td>
+      <td colspan="3" style="background:#f8fafc;font-weight:600;color:#374151">Fecha: ${date}</td>
+    </tr>
+    <tr>
+      <td colspan="3" style="background:#eff6ff;font-weight:700;color:#1d4ed8">Total keywords: ${totalKws}</td>
+      <td colspan="2" style="background:#f0fdf4;font-weight:700;color:#15803d">Alta oportunidad (&gt;70): ${highScore}</td>
+      <td colspan="2" style="background:#faf5ff;font-weight:700;color:#7c3aed">Intención local: ${localKws}</td>
+      <td colspan="2" style="background:#fff7ed;font-weight:700;color:#c2410c">Esta URL: ${targetKws}</td>
+      <td colspan="2" style="background:#f8fafc;font-weight:700;color:#475569">Otras páginas: ${totalKws - targetKws}</td>
+    </tr>
+    <tr style="height:6px"><td colspan="11" style="border:none;background:white"></td></tr>
+    <tr>
+      <th style="width:36px">#</th>
+      <th>Keyword</th>
+      <th>Posición</th>
+      <th>Tráfico</th>
+      <th>Volumen</th>
+      <th>Intención</th>
+      <th>Tratamiento</th>
+      <th>Localidad</th>
+      <th>Score</th>
+      <th>Página URL</th>
+      <th>Esta URL</th>
+    </tr>
+    ${rows}
+  </table></body></html>`;
+
+  const blob = new Blob([html], { type: 'application/vnd.ms-excel;charset=utf-8;' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = `kw-${domain}-${new Date().toISOString().split('T')[0]}.csv`;
+  a.download = `kw-${domain}-${date}.xls`;
   a.click();
 }
 
@@ -99,12 +163,13 @@ export default function Home() {
   const [activeTab, setActiveTab] = useState<'keywords' | 'clusters' | 'local'>('keywords');
   const [filterTreatment, setFilterTreatment] = useState('all');
   const [filterIntent, setFilterIntent] = useState<IntentType | 'all'>('all');
+  const [filterPage, setFilterPage] = useState<'all' | 'target' | 'other'>('all');
   const [sortBy, setSortBy] = useState<'score' | 'traffic' | 'position'>('score');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(''); setResult(null); setLoading(true);
-    setFilterTreatment('all'); setFilterIntent('all'); setActiveTab('keywords');
+    setFilterTreatment('all'); setFilterIntent('all'); setFilterPage('all'); setActiveTab('keywords');
     try {
       const res = await fetch('/api/analyze', {
         method: 'POST',
@@ -130,12 +195,14 @@ export default function Home() {
     let kws = result.keywords;
     if (filterTreatment !== 'all') kws = kws.filter(k => (k.treatment || 'sin clasificar') === filterTreatment);
     if (filterIntent !== 'all') kws = kws.filter(k => (k.intentType || 'general') === filterIntent);
+    if (filterPage === 'target') kws = kws.filter(k => k.isTargetPage !== false);
+    if (filterPage === 'other') kws = kws.filter(k => k.isTargetPage === false);
     return [...kws].sort((a, b) => {
       if (sortBy === 'score') return (b.score || 0) - (a.score || 0);
       if (sortBy === 'traffic') return (b.traffic || 0) - (a.traffic || 0);
       return (a.position || 999) - (b.position || 999);
     });
-  }, [result, filterTreatment, filterIntent, sortBy]);
+  }, [result, filterTreatment, filterIntent, filterPage, sortBy]);
 
   const intentCounts = useMemo(() => {
     if (!result) return {} as Record<string, number>;
@@ -145,6 +212,12 @@ export default function Home() {
       counts[t] = (counts[t] || 0) + 1;
     }
     return counts;
+  }, [result]);
+
+  const pageCounts = useMemo(() => {
+    if (!result) return { target: 0, other: 0 };
+    const other = result.keywords.filter(k => k.isTargetPage === false).length;
+    return { target: result.keywords.length - other, other };
   }, [result]);
 
   const maxCount = result ? Math.max(...result.clusters.map(c => c.count), 1) : 1;
@@ -269,8 +342,8 @@ export default function Home() {
                   Completado en {(result.metadata.processingTime / 1000).toFixed(1)}s · DataForSEO Labs
                 </div>
               </div>
-              <button onClick={() => exportCSV(result.keywords, domain)} className={styles.exportBtn}>
-                ⬇️ Exportar CSV
+              <button onClick={() => exportExcel(result.keywords, domain, url)} className={styles.exportBtn}>
+                📊 Exportar Excel
               </button>
             </div>
 
@@ -357,8 +430,26 @@ export default function Home() {
                       <option value="position">↕ Posición</option>
                     </select>
                   </div>
+                  {pageCounts.other > 0 && (
+                    <div className={styles.filterRow}>
+                      <span className={styles.filterLabel}>Página</span>
+                      <div className={styles.filterChips}>
+                        <button className={filterPage === 'all' ? styles.chipActive : styles.chip} onClick={() => setFilterPage('all')}>
+                          🌐 Todo el dominio <span className={styles.chipCount}>{result.keywords.length}</span>
+                        </button>
+                        <button className={filterPage === 'target' ? styles.chipActive : styles.chip} onClick={() => setFilterPage('target')}>
+                          📌 Esta URL <span className={styles.chipCount}>{pageCounts.target}</span>
+                        </button>
+                        <button className={filterPage === 'other' ? styles.chipActive : styles.chip} onClick={() => setFilterPage('other')}>
+                          📄 Otras páginas <span className={styles.chipCount}>{pageCounts.other}</span>
+                        </button>
+                      </div>
+                    </div>
+                  )}
                   <div className={styles.filterSummary}>
                     Mostrando <strong>{filteredKeywords.length}</strong> de <strong>{result.keywords.length}</strong> keywords
+                    {filterPage === 'target' && <span className={styles.filterTag}>· Esta URL</span>}
+                    {filterPage === 'other' && <span className={styles.filterTag}>· Otras páginas</span>}
                     {filterIntent !== 'all' && <span className={styles.filterTag}>· {INTENT_META[filterIntent].label}</span>}
                     {filterTreatment !== 'all' && <span className={styles.filterTag}>· {filterTreatment}</span>}
                   </div>
@@ -384,7 +475,10 @@ export default function Home() {
                           <td className={styles.rowNum}>{idx + 1}</td>
                           <td className={styles.kwCell}>
                             <div className={styles.kwText}>{kw.keyword}</div>
-                            <div className={styles.kwUrl}>{kw.url}</div>
+                            <div className={styles.kwUrl}>
+                              {kw.isTargetPage === false && <span className={styles.otherPageTag}>Otra página · </span>}
+                              {kw.url}
+                            </div>
                           </td>
                           <td>
                             <span className={`${styles.posBadge} ${styles[getPositionClass(kw.position)]}`}>

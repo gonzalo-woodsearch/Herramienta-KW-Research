@@ -74,6 +74,36 @@ export class RankedKeywordsService {
     return input.replace(/\/.*$/, '');
   }
 
+  private hasSpecificPath(url: string): boolean {
+    try {
+      const parsed = new URL(url.startsWith('http') ? url : `https://${url}`);
+      return parsed.pathname !== '/' && parsed.pathname !== '';
+    } catch {
+      return false;
+    }
+  }
+
+  private normalizeUrlForMatch(url: string): string {
+    try {
+      const u = new URL(url.startsWith('http') ? url : `https://${url}`);
+      return (u.hostname + u.pathname).replace(/\/+$/, '').toLowerCase();
+    } catch {
+      return url.toLowerCase().replace(/[?#].*$/, '').replace(/\/+$/, '');
+    }
+  }
+
+  private applyTargetPage(keywords: Keyword[], targetUrl: string): Keyword[] {
+    if (!this.hasSpecificPath(targetUrl)) {
+      return keywords.map(kw => ({ ...kw, isTargetPage: true }));
+    }
+    const targetNorm = this.normalizeUrlForMatch(targetUrl);
+    return keywords.map(kw => {
+      const kwNorm = this.normalizeUrlForMatch(kw.url);
+      const isTargetPage = kwNorm === targetNorm || kwNorm.startsWith(targetNorm + '/');
+      return { ...kw, isTargetPage };
+    });
+  }
+
   private getCacheKey(domain: string): string {
     return `dataforseo:ranked:${domain}`;
   }
@@ -89,7 +119,7 @@ export class RankedKeywordsService {
     const cached = cache.get<Keyword[]>(cacheKey);
     if (cached) {
       logger.info(`Using cached DataForSEO data for ${domain}`);
-      return cached.slice(0, limit);
+      return this.applyTargetPage(cached.slice(0, limit), targetUrl);
     }
 
     logger.info(`Fetching ranked keywords from DataForSEO for ${domain}`, { limit });
@@ -136,7 +166,7 @@ export class RankedKeywordsService {
 
     cache.set(cacheKey, keywords, config.ahrefs.cacheTtl);
 
-    return keywords;
+    return this.applyTargetPage(keywords.slice(0, limit), targetUrl);
   }
 }
 
