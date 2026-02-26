@@ -1,7 +1,7 @@
 /**
  * Cliente base para Ahrefs API v3
+ * Usa GET con query parameters según la especificación de la API v3
  */
-
 
 import config from '../../config';
 import logger from '../../utils/logger';
@@ -23,24 +23,28 @@ export class AhrefsClient {
 
   async request<T>(
     endpoint: string,
-    method: 'GET' | 'POST' = 'POST',
-    body?: any
+    params: Record<string, string | number | undefined>
   ): Promise<T> {
     await this.rateLimiter.acquire();
 
     return retry(async () => {
-      const url = `${AHREFS_API_BASE}${endpoint}`;
+      const url = new URL(`${AHREFS_API_BASE}${endpoint}`);
 
-      logger.debug(`Ahrefs API request: ${method} ${endpoint}`, body);
+      // Añadir query parameters
+      Object.entries(params).forEach(([key, value]) => {
+        if (value !== undefined && value !== null) {
+          url.searchParams.append(key, String(value));
+        }
+      });
 
-      const response = await fetch(url, {
-        method,
+      logger.debug(`Ahrefs API GET ${endpoint}`, params);
+
+      const response = await fetch(url.toString(), {
+        method: 'GET',
         headers: {
           'Authorization': `Bearer ${this.apiKey}`,
-          'Content-Type': 'application/json',
           'Accept': 'application/json',
         },
-        body: body ? JSON.stringify(body) : undefined,
       });
 
       if (!response.ok) {
@@ -49,9 +53,8 @@ export class AhrefsClient {
 
         try {
           const errorJson = JSON.parse(errorText);
-          errorMessage = errorJson.error?.message || errorMessage;
+          errorMessage = errorJson.detail || errorJson.error?.message || errorMessage;
         } catch {
-          // Si no es JSON, usar el texto como está
           errorMessage = errorText || errorMessage;
         }
 
