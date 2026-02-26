@@ -2,7 +2,7 @@
  * Cliente base para Ahrefs API v3
  */
 
-import fetch from 'node-fetch';
+
 import config from '../../config';
 import logger from '../../utils/logger';
 import { retry } from '../../utils/retry';
