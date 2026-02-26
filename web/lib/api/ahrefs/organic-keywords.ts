@@ -28,21 +28,38 @@ export class OrganicKeywordsService {
     return `ahrefs:organic:${url}:${country}`;
   }
 
+  private extractDomain(input: string): string {
+    // Si tiene protocolo, extraer solo el hostname
+    if (input.startsWith('http://') || input.startsWith('https://')) {
+      try {
+        const parsed = new URL(input);
+        return parsed.hostname;
+      } catch {
+        // Si falla el parseo, limpiar manualmente
+        return input.replace(/^https?:\/\//, '').replace(/\/.*$/, '');
+      }
+    }
+    // Si no tiene protocolo, quitar path y trailing slash
+    return input.replace(/\/.*$/, '');
+  }
+
   async getOrganicKeywords(
     targetUrl: string,
     country: string = 'es',
     limit: number = DEFAULT_LIMIT
   ): Promise<Keyword[]> {
-    const cacheKey = this.getCacheKey(targetUrl, country);
+    // Ahrefs espera solo el dominio, sin protocolo ni path
+    const domain = this.extractDomain(targetUrl);
+    const cacheKey = this.getCacheKey(domain, country);
 
     // Intentar obtener del cache
     const cached = cache.get<Keyword[]>(cacheKey);
     if (cached) {
-      logger.info(`Using cached Ahrefs data for ${targetUrl}`);
+      logger.info(`Using cached Ahrefs data for ${domain}`);
       return cached.slice(0, limit);
     }
 
-    logger.info(`Fetching organic keywords from Ahrefs for ${targetUrl}`, {
+    logger.info(`Fetching organic keywords from Ahrefs for ${domain}`, {
       country,
       limit,
     });
@@ -56,7 +73,7 @@ export class OrganicKeywordsService {
       const batchLimit = Math.min(BATCH_SIZE, limit - allKeywords.length);
 
       const request: AhrefsOrganicKeywordsRequest = {
-        target: targetUrl,
+        target: domain,
         limit: batchLimit,
         offset,
         country,
@@ -86,8 +103,8 @@ export class OrganicKeywordsService {
         }
       } catch (error) {
         logger.error(`Error fetching organic keywords at offset ${offset}`, error);
-        // Si falla una página, retornar lo que tenemos
-        break;
+        // Re-lanzar el error para que el API route lo muestre al usuario
+        throw error;
       }
     }
 
@@ -100,7 +117,7 @@ export class OrganicKeywordsService {
       position: kw.position,
       traffic: kw.traffic,
       ahrefsVolume: kw.volume,
-      url: kw.url || targetUrl,
+      url: kw.url || domain,
       keywordDifficulty: kw.keyword_difficulty,
     }));
 
