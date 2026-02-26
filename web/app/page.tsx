@@ -127,43 +127,76 @@ export default function Home() {
 
   const maxCount = result ? Math.max(...result.clusters.map(c => c.count), 1) : 1;
 
+  const searchForm = (compact: boolean) => (
+    <form onSubmit={handleSubmit} className={styles.form}>
+      <div className={styles.inputWrapper}>
+        <span className={styles.inputIcon}>🌐</span>
+        <input
+          type="url" value={url} onChange={e => setUrl(e.target.value)}
+          placeholder="https://www.clinicadental.com" required
+          className={styles.urlInput}
+        />
+      </div>
+      <div className={styles.formControls}>
+        <select value={limit} onChange={e => setLimit(Number(e.target.value))} className={styles.select}>
+          <option value={30}>30 keywords</option>
+          <option value={50}>50 keywords</option>
+          <option value={100}>100 keywords</option>
+          <option value={150}>150 keywords</option>
+          <option value={200}>200 keywords</option>
+        </select>
+        <button type="submit" disabled={loading} className={compact ? styles.analyzeBtnSm : styles.analyzeBtn}>
+          {loading ? '⏳ Analizando...' : '🔍 Analizar'}
+        </button>
+      </div>
+    </form>
+  );
+
   return (
     <div className={styles.app}>
-      <header className={styles.header}>
-        <div className={styles.headerInner}>
-          <span className={styles.logoIcon}>🦷</span>
-          <div>
-            <h1 className={styles.title}>KW Research Tool</h1>
-            <p className={styles.subtitle}>Análisis de keywords dental · España</p>
-          </div>
-        </div>
-      </header>
 
-      <main className={styles.main}>
-        <div className={styles.searchCard}>
-          <form onSubmit={handleSubmit} className={styles.form}>
-            <div className={styles.inputWrapper}>
-              <span className={styles.inputIcon}>🌐</span>
-              <input
-                type="url" value={url} onChange={e => setUrl(e.target.value)}
-                placeholder="https://www.clinicadental.com" required
-                className={styles.urlInput}
-              />
+      {/* Compact header: solo visible cuando hay resultados o está cargando */}
+      {(result || loading) && (
+        <header className={styles.header}>
+          <div className={styles.headerInner}>
+            <span className={styles.logoIcon}>🦷</span>
+            <div style={{ flex: 1 }}>
+              <h1 className={styles.title}>KW ReWoodSearch</h1>
+              <p className={styles.subtitle}>Mejor herramienta de análisis de keywords de España</p>
             </div>
-            <div className={styles.formControls}>
-              <select value={limit} onChange={e => setLimit(Number(e.target.value))} className={styles.select}>
-                <option value={30}>30 keywords</option>
-                <option value={50}>50 keywords</option>
-                <option value={100}>100 keywords</option>
-                <option value={150}>150 keywords</option>
-                <option value={200}>200 keywords</option>
-              </select>
-              <button type="submit" disabled={loading} className={styles.analyzeBtn}>
-                {loading ? '⏳ Analizando...' : '🔍 Analizar'}
-              </button>
+          </div>
+        </header>
+      )}
+
+      <main className={result || loading ? styles.main : styles.mainHero}>
+
+        {/* HERO: pantalla de inicio sin resultados */}
+        {!result && !loading && (
+          <div className={styles.hero}>
+            <div className={styles.heroBadge}>🇪🇸 Especializada en el mercado español</div>
+            <div className={styles.heroLogo}>🦷</div>
+            <h1 className={styles.heroTitle}>KW ReWoodSearch</h1>
+            <p className={styles.heroSubtitle}>
+              Mejor herramienta de análisis de keywords de España
+            </p>
+            <div className={styles.heroCard}>
+              {searchForm(false)}
             </div>
-          </form>
-        </div>
+            <div className={styles.heroFeatures}>
+              <span className={styles.heroFeature}><span>📍</span> Intención ultra-local</span>
+              <span className={styles.heroFeature}><span>🏥</span> Clasificación dental</span>
+              <span className={styles.heroFeature}><span>📊</span> Scoring 0–100</span>
+              <span className={styles.heroFeature}><span>⬇️</span> Export CSV</span>
+            </div>
+          </div>
+        )}
+
+        {/* Búsqueda compacta cuando hay resultados */}
+        {(result || loading) && (
+          <div className={styles.searchCard}>
+            {searchForm(true)}
+          </div>
+        )}
 
         {error && (
           <div className={styles.errorBox}>
