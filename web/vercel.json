@@ -1,0 +1,13 @@
+{
+  "buildCommand": "npm run build",
+  "devCommand": "npm run dev",
+  "installCommand": "npm install",
+  "framework": "nextjs",
+  "outputDirectory": ".next",
+  "env": {
+    "AHREFS_API_KEY": "@ahrefs-api-key",
+    "CACHE_TTL_AHREFS": "86400",
+    "AHREFS_RATE_LIMIT": "10",
+    "LOG_LEVEL": "info"
+  }
+}
