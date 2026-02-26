@@ -1,0 +1,19 @@
+{
+  "mcpServers": {
+    "kw-research-dental": {
+      "command": "node",
+      "args": [
+        "C:/Users/TU_USUARIO/Desktop/Herramienta KW Research/dist/mcp/server.js"
+      ],
+      "env": {
+        "AHREFS_API_KEY": "tu_ahrefs_api_key",
+        "GOOGLE_ADS_DEVELOPER_TOKEN": "tu_developer_token",
+        "GOOGLE_ADS_CLIENT_ID": "tu_client_id.apps.googleusercontent.com",
+        "GOOGLE_ADS_CLIENT_SECRET": "tu_client_secret",
+        "GOOGLE_ADS_REFRESH_TOKEN": "tu_refresh_token",
+        "GOOGLE_ADS_CUSTOMER_ID": "1234567890",
+        "LOG_LEVEL": "info"
+      }
+    }
+  }
+}

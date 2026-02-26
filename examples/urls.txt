@@ -1,0 +1,16 @@
+# URLs de ejemplo para analizar
+# Usar con: npm start -- url --url <URL>
+
+# Clínicas dentales ejemplo (reemplazar con URLs reales de Ahrefs)
+https://www.clinicadental.es/implantes-dentales
+https://www.clinicadental.es/ortodoncia-invisible
+https://www.clinicadental.es/blanqueamiento-dental
+https://www.clinicadental.es/carillas-dentales
+
+# Nota: Las URLs deben existir en la base de datos de Ahrefs
+# y tener keywords orgánicas para obtener resultados.
+
+# Para encontrar URLs de competidores:
+# 1. Usa Ahrefs Site Explorer manualmente
+# 2. Busca URLs con tráfico orgánico relevante
+# 3. Usa esta herramienta para analizar esas URLs

@@ -1,0 +1,44 @@
+{
+  "name": "kw-research-dental",
+  "version": "1.0.0",
+  "description": "Herramienta de investigación de keywords para clínicas dentales en España usando Ahrefs API v3 + Google Ads API",
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": {
+    "kwtool": "dist/cli/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx src/cli/index.ts",
+    "start": "node dist/cli/index.js",
+    "verify": "tsx src/verify-credentials.ts",
+    "mcp": "node dist/mcp/server.js",
+    "test": "vitest",
+    "test:watch": "vitest --watch",
+    "lint": "tsc --noEmit"
+  },
+  "keywords": [
+    "keywords",
+    "seo",
+    "ahrefs",
+    "google-ads",
+    "dental",
+    "spain"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.4",
+    "commander": "^12.1.0",
+    "csv-writer": "^1.6.0",
+    "dotenv": "^16.4.7",
+    "google-ads-api": "^18.2.0",
+    "node-fetch": "^3.3.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.5",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.3",
+    "vitest": "^2.1.8"
+  }
+}
