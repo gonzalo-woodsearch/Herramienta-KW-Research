@@ -2,19 +2,7 @@
  * DataForSEO Keywords Explorer
  *
  * Overview:  /keywords_data/google_ads/search_volume/live
- *            → exact volume, CPC, competition for the seed keyword
- *
  * Ideas:     /keywords_data/google_ads/keywords_for_keywords/live
- *            → Google Keyword Planner ideas (broader, more diverse)
- *
- * Both run in parallel.
- *
- * Response field names (confirmed from DataForSEO docs):
- *   - competition: "LOW" | "MEDIUM" | "HIGH" | null  (NOT competition_level)
- *   - competition_index: 0-100 integer
- *   - cpc: float (USD)
- *   - search_volume: integer
- *   - keywords_for_keywords result: flat array in task.result (NOT task.result[0].items)
  */
 
 import DataForSEOClient from '../dataforseo/client';
@@ -57,10 +45,10 @@ export interface ExplorerResult {
   country: string;
   overview: SeedOverview | null;
   keywords: ExplorerKeyword[];
-  _warnings?: string[];
+  _debug?: any;
 }
 
-// Raw item shape returned by Google Ads endpoints (confirmed field names)
+// Raw item shape returned by Google Ads endpoints
 interface GadsItem {
   keyword?: string;
   search_volume?: number;
@@ -91,7 +79,6 @@ function categorize(keyword: string): KwCategory {
   return 'idea';
 }
 
-// Map competition to a 0-100 difficulty proxy using competition_index when available
 function compToDifficulty(item: GadsItem): number {
   if (item.competition_index != null) return item.competition_index;
   if (item.competition === 'HIGH') return 75;
@@ -107,7 +94,6 @@ function toCpc(usd: number): number {
 function mapGadsItem(item: GadsItem, defaultCat: KwCategory): ExplorerKeyword | null {
   if (!item.keyword) return null;
   const cat = categorize(item.keyword);
-  // Use cpc, fallback to high_top_of_page_bid
   const cpcValue = item.cpc ?? item.high_top_of_page_bid ?? 0;
   return {
     keyword: item.keyword,
@@ -130,7 +116,6 @@ export class KeywordsExplorerService {
     return GEO_MAP[country.toUpperCase()] ?? GEO_MAP['ES'];
   }
 
-  /** Exact metrics for the seed keyword */
   private async fetchOverview(seed: string, country: string): Promise<SeedOverview | null> {
     const geo = this.getGeo(country);
     const res = await this.client.post<DfsResponse>(
@@ -142,11 +127,10 @@ export class KeywordsExplorerService {
       }]
     );
 
-    if (res.status_code !== 20000) throw new Error(`search_volume: ${res.status_message}`);
+    if (res.status_code !== 20000) throw new Error(`search_volume API: ${res.status_message}`);
     const task = res.tasks?.[0];
-    if (!task || task.status_code !== 20000) throw new Error(`Task: ${task?.status_message}`);
+    if (!task || task.status_code !== 20000) throw new Error(`search_volume task: ${task?.status_message}`);
 
-    // result is a flat array of keyword objects
     const items: GadsItem[] = task.result || [];
     const item = items.find(i => i.keyword?.toLowerCase() === seed.toLowerCase()) ?? items[0];
     if (!item) return null;
@@ -160,33 +144,60 @@ export class KeywordsExplorerService {
     };
   }
 
-  /** Broader keyword ideas via Google Keyword Planner */
-  private async fetchIdeas(seed: string, country: string): Promise<GadsItem[]> {
+  private async fetchIdeas(seed: string, country: string): Promise<{ items: GadsItem[]; debug: any }> {
     const geo = this.getGeo(country);
-    const res = await this.client.post<DfsResponse>(
-      '/keywords_data/google_ads/keywords_for_keywords/live',
-      [{
-        keywords: [seed],
-        location_code: geo.location_code,
-        language_code: geo.language_code,
-        sort_by: 'search_volume',
-      }]
-    );
+    let rawResponse: any = null;
 
-    if (res.status_code !== 20000) throw new Error(`keywords_for_keywords API: ${res.status_message}`);
-    const task = res.tasks?.[0];
-    if (!task || task.status_code !== 20000) throw new Error(`keywords_for_keywords task: ${task?.status_message}`);
+    try {
+      const res = await this.client.post<DfsResponse>(
+        '/keywords_data/google_ads/keywords_for_keywords/live',
+        [{
+          keywords: [seed],
+          location_code: geo.location_code,
+          language_code: geo.language_code,
+        }]
+      );
 
-    // result is a flat array of GadsItem objects
-    const r = task.result;
-    if (!r || !Array.isArray(r)) return [];
-    // Defensive: handle nested structure if API ever changes
-    if (r.length > 0 && Array.isArray(r[0]?.items)) return r[0].items;
-    return r as GadsItem[];
+      rawResponse = {
+        status_code: res.status_code,
+        status_message: res.status_message,
+        task_status: res.tasks?.[0]?.status_code,
+        task_message: res.tasks?.[0]?.status_message,
+        result_type: typeof res.tasks?.[0]?.result,
+        result_is_array: Array.isArray(res.tasks?.[0]?.result),
+        result_length: res.tasks?.[0]?.result?.length ?? 0,
+        first_item_keys: res.tasks?.[0]?.result?.[0] ? Object.keys(res.tasks[0].result[0]) : [],
+        first_item_sample: res.tasks?.[0]?.result?.[0] ?? null,
+      };
+
+      if (res.status_code !== 20000) {
+        return { items: [], debug: { ...rawResponse, error: `API error: ${res.status_message}` } };
+      }
+
+      const task = res.tasks?.[0];
+      if (!task || task.status_code !== 20000) {
+        return { items: [], debug: { ...rawResponse, error: `Task error: ${task?.status_message}` } };
+      }
+
+      const r = task.result;
+      if (!r || !Array.isArray(r) || r.length === 0) {
+        return { items: [], debug: { ...rawResponse, note: 'result is empty or not array' } };
+      }
+
+      // Handle both flat array and nested structure
+      if (Array.isArray(r[0]?.items)) {
+        return { items: r[0].items, debug: { ...rawResponse, structure: 'nested result[0].items', count: r[0].items.length } };
+      }
+
+      return { items: r as GadsItem[], debug: { ...rawResponse, structure: 'flat result array', count: r.length } };
+
+    } catch (err: any) {
+      return { items: [], debug: { raw: rawResponse, error: err.message } };
+    }
   }
 
   async explore(seed: string, country = 'ES', limit = 50): Promise<ExplorerResult> {
-    const cacheKey = `dfs4:explorer:${seed.toLowerCase().trim()}:${country}`;
+    const cacheKey = `dfs5:explorer:${seed.toLowerCase().trim()}:${country}`;
     const cached = cache.get<ExplorerResult>(cacheKey);
     if (cached) {
       logger.info(`Using cached explorer data for "${seed}"`);
@@ -200,25 +211,28 @@ export class KeywordsExplorerService {
       this.fetchIdeas(seed, country),
     ]);
 
-    const warnings: string[] = [];
+    const debugInfo: any = {};
+
     if (overviewRes.status === 'rejected') {
-      const msg = `Overview failed: ${overviewRes.reason}`;
-      logger.warn(msg);
-      warnings.push(msg);
-    }
-    if (ideasRes.status === 'rejected') {
-      const msg = `Ideas failed: ${ideasRes.reason}`;
-      logger.warn(msg);
-      warnings.push(msg);
+      logger.warn(`Overview failed for "${seed}": ${overviewRes.reason}`);
+      debugInfo.overviewError = String(overviewRes.reason);
     }
 
     const overview = overviewRes.status === 'fulfilled' ? overviewRes.value : null;
-    const rawIdeas = ideasRes.status === 'fulfilled' ? ideasRes.value : [];
+
+    let rawItems: GadsItem[] = [];
+    if (ideasRes.status === 'fulfilled') {
+      rawItems = ideasRes.value.items;
+      debugInfo.ideasApi = ideasRes.value.debug;
+    } else {
+      logger.warn(`Ideas failed for "${seed}": ${ideasRes.reason}`);
+      debugInfo.ideasError = String(ideasRes.reason);
+    }
 
     const seen = new Set<string>([seed.toLowerCase().trim()]);
     const keywords: ExplorerKeyword[] = [];
 
-    for (const item of rawIdeas) {
+    for (const item of rawItems) {
       if (!item.keyword) continue;
       const norm = item.keyword.toLowerCase().trim();
       if (seen.has(norm)) continue;
@@ -229,13 +243,15 @@ export class KeywordsExplorerService {
 
     keywords.sort((a, b) => b.volume - a.volume);
 
-    const result: ExplorerResult = { seed, country, overview, keywords };
+    const result: ExplorerResult = { seed, country, overview, keywords, _debug: debugInfo };
 
     if (overview || keywords.length > 0) {
-      cache.set(cacheKey, result, config.ahrefs.cacheTtl);
+      // Cache without _debug
+      const { _debug, ...toCache } = result;
+      cache.set(cacheKey, toCache as ExplorerResult, config.ahrefs.cacheTtl);
     }
 
-    return { ...result, keywords: keywords.slice(0, limit), _warnings: warnings.length > 0 ? warnings : undefined };
+    return { ...result, keywords: keywords.slice(0, limit) };
   }
 }
 
