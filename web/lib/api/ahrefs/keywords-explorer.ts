@@ -112,10 +112,11 @@ export class KeywordsExplorerService {
   private async fetchMatchingTerms(seed: string, country: string, limit: number): Promise<RawKw[]> {
     try {
       const res = await this.client.request('/keywords-explorer/matching-terms', {
-        terms: seed,
+        keywords: seed,
         select: EXPLORER_SELECT,
         country: country.toUpperCase(),
         limit,
+        order_by: 'volume:desc',
       });
       return parseRows(res);
     } catch (e) {
@@ -131,6 +132,7 @@ export class KeywordsExplorerService {
         select: EXPLORER_SELECT,
         country: country.toUpperCase(),
         limit,
+        order_by: 'volume:desc',
       });
       return parseRows(res);
     } catch (e) {
@@ -143,10 +145,10 @@ export class KeywordsExplorerService {
     try {
       const res = await this.client.request('/keywords-explorer/related-terms', {
         keywords: seed,
-        view_for: 'also_rank_for',
         select: EXPLORER_SELECT,
         country: country.toUpperCase(),
         limit,
+        order_by: 'volume:desc',
       });
       return parseRows(res);
     } catch (e) {
