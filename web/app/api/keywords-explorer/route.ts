@@ -7,8 +7,8 @@ export const maxDuration = 60;
 
 export async function POST(request: NextRequest) {
   try {
-    if (!config.ahrefs.apiKey) {
-      return NextResponse.json({ error: 'AHREFS_NOT_CONFIGURED' }, { status: 503 });
+    if (!config.dataforseo.login || !config.dataforseo.password) {
+      return NextResponse.json({ error: 'DATAFORSEO_NOT_CONFIGURED' }, { status: 503 });
     }
 
     const body = await request.json();

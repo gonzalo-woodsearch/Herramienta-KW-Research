@@ -292,7 +292,7 @@ export default function Home() {
         body: JSON.stringify({ keyword, country: explorerCountry, limit: explorerLimit }),
       });
       const data = await res.json();
-      if (data.error === 'AHREFS_NOT_CONFIGURED') {
+      if (data.error === 'AHREFS_NOT_CONFIGURED' || data.error === 'DATAFORSEO_NOT_CONFIGURED') {
         setExplorerError('not_configured');
       } else if (data.error) {
         throw new Error(data.error);
@@ -488,7 +488,7 @@ export default function Home() {
           <div className={styles.loadingCard} style={{ padding: '2rem' }}>
             <div className={styles.loadingSpinner}></div>
             <p className={styles.loadingText}>Buscando ideas para <strong>"{explorerKw}"</strong></p>
-            <p className={styles.loadingHint}>Consultando Ahrefs Keywords Explorer...</p>
+            <p className={styles.loadingHint}>Consultando DataForSEO...</p>
           </div>
         )}
         {!explorerResult && !explorerLoading && !explorerError && (
