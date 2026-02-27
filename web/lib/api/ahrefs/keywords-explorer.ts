@@ -157,7 +157,6 @@ export class KeywordsExplorerService {
         location_code: geo.location_code,
         language_code: geo.language_code,
         limit,
-        order_by: 'search_volume,desc',
       }]
     );
 
@@ -165,12 +164,17 @@ export class KeywordsExplorerService {
     const task = res.tasks?.[0];
     if (!task || task.status_code !== 20000) throw new Error(`Task: ${task?.status_message}`);
 
-    // result[0].items contains the ideas
-    return task.result?.[0]?.items ?? [];
+    // keywords_for_keywords returns a flat array directly in task.result
+    // (not nested in result[0].items like DataForSEO Labs endpoints)
+    const r = task.result;
+    if (!r || !Array.isArray(r)) return [];
+    // Handle both flat array and nested structure defensively
+    if (r.length > 0 && r[0]?.items) return r[0].items;
+    return r;
   }
 
   async explore(seed: string, country = 'ES', limit = 50): Promise<ExplorerResult> {
-    const cacheKey = `dfs2:explorer:${seed.toLowerCase().trim()}:${country}:${limit}`;
+    const cacheKey = `dfs3:explorer:${seed.toLowerCase().trim()}:${country}:${limit}`;
     const cached = cache.get<ExplorerResult>(cacheKey);
     if (cached) {
       logger.info(`Using cached explorer data for "${seed}"`);
