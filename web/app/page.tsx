@@ -72,6 +72,42 @@ interface AnalysisResult {
   };
 }
 
+type KwCategory = 'idea' | 'question' | 'comparison' | 'related';
+
+interface ExplorerKw {
+  keyword: string;
+  volume: number;
+  cpcEur: number;
+  difficulty: number;
+  trafficPotential: number;
+  category: KwCategory;
+}
+
+interface ExplorerResult {
+  seed: string;
+  country: string;
+  overview: { keyword: string; volume: number; cpcEur: number; difficulty: number; trafficPotential: number } | null;
+  keywords: ExplorerKw[];
+}
+
+const EXPLORER_COUNTRIES = [
+  { code: 'ES', label: '🇪🇸 España' },
+  { code: 'MX', label: '🇲🇽 México' },
+  { code: 'AR', label: '🇦🇷 Argentina' },
+  { code: 'CO', label: '🇨🇴 Colombia' },
+  { code: 'US', label: '🇺🇸 Estados Unidos' },
+  { code: 'GB', label: '🇬🇧 Reino Unido' },
+  { code: 'DE', label: '🇩🇪 Alemania' },
+  { code: 'FR', label: '🇫🇷 Francia' },
+];
+
+const CAT_META: Record<KwCategory, { label: string; emoji: string; color: string; bg: string; border: string }> = {
+  idea:       { label: 'Idea',      emoji: '💡', color: '#1d4ed8', bg: '#eff6ff', border: '#93c5fd' },
+  question:   { label: 'Pregunta',  emoji: '❓', color: '#7c3aed', bg: '#faf5ff', border: '#c4b5fd' },
+  comparison: { label: 'Comp.',     emoji: '💰', color: '#c2410c', bg: '#fff7ed', border: '#fdba74' },
+  related:    { label: 'Relacionada', emoji: '🔗', color: '#0f766e', bg: '#f0fdfa', border: '#5eead4' },
+};
+
 function getPositionClass(pos?: number): string {
   if (!pos) return 'posGray';
   if (pos <= 3) return 'posGreen';
@@ -180,7 +216,7 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [result, setResult] = useState<AnalysisResult | null>(null);
-  const [activeTab, setActiveTab] = useState<'keywords' | 'clusters' | 'local' | 'domain'>('keywords');
+  const [activeTab, setActiveTab] = useState<'keywords' | 'clusters' | 'local' | 'domain' | 'explorer'>('keywords');
   const [filterTreatment, setFilterTreatment] = useState('all');
   const [filterIntent, setFilterIntent] = useState<IntentType | 'all'>('all');
   const [filterPage, setFilterPage] = useState<'all' | 'target' | 'other'>('all');
@@ -188,6 +224,18 @@ export default function Home() {
   const [domainStats, setDomainStats] = useState<DomainStats | null>(null);
   const [domainStatsLoading, setDomainStatsLoading] = useState(false);
   const [domainStatsError, setDomainStatsError] = useState('');
+
+  // Keywords Explorer state
+  const [explorerKw, setExplorerKw] = useState('');
+  const [explorerCountry, setExplorerCountry] = useState('ES');
+  const [explorerLimit, setExplorerLimit] = useState(50);
+  const [explorerLoading, setExplorerLoading] = useState(false);
+  const [explorerError, setExplorerError] = useState('');
+  const [explorerResult, setExplorerResult] = useState<ExplorerResult | null>(null);
+  const [explorerSubTab, setExplorerSubTab] = useState<'all' | 'questions' | 'comparisons' | 'related'>('all');
+  // Hero mode + drill-down navigation
+  const [heroMode, setHeroMode] = useState<'url' | 'kw'>('url');
+  const [explorerBreadcrumb, setExplorerBreadcrumb] = useState<string[]>([]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -230,6 +278,59 @@ export default function Home() {
       })
       .catch(() => setDomainStatsError('connection_error'))
       .finally(() => setDomainStatsLoading(false));
+  };
+
+  const doExplore = async (keyword: string) => {
+    setExplorerError('');
+    setExplorerResult(null);
+    setExplorerLoading(true);
+    setExplorerSubTab('all');
+    try {
+      const res = await fetch('/api/keywords-explorer', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ keyword, country: explorerCountry, limit: explorerLimit }),
+      });
+      const data = await res.json();
+      if (data.error === 'AHREFS_NOT_CONFIGURED') {
+        setExplorerError('not_configured');
+      } else if (data.error) {
+        throw new Error(data.error);
+      } else {
+        setExplorerResult(data);
+      }
+    } catch (err: any) {
+      setExplorerError(err.message || 'Error al buscar ideas');
+    } finally {
+      setExplorerLoading(false);
+    }
+  };
+
+  const handleExplore = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!explorerKw.trim()) return;
+    setExplorerBreadcrumb([]);
+    doExplore(explorerKw.trim());
+  };
+
+  const drillIntoKeyword = (kw: string) => {
+    setExplorerBreadcrumb(prev => [...prev, explorerKw]);
+    setExplorerKw(kw);
+    doExplore(kw);
+  };
+
+  const navigateBreadcrumb = (idx: number) => {
+    if (idx < 0) {
+      setExplorerBreadcrumb([]);
+      setExplorerResult(null);
+      setExplorerError('');
+      setExplorerKw('');
+      return;
+    }
+    const target = explorerBreadcrumb[idx];
+    setExplorerBreadcrumb(explorerBreadcrumb.slice(0, idx));
+    setExplorerKw(target);
+    doExplore(target);
   };
 
   const domain = url ? (() => { try { return new URL(url).hostname; } catch { return url; } })() : '';
@@ -322,11 +423,202 @@ export default function Home() {
     </form>
   );
 
+  const explorerSearchForm = (compact: boolean) => (
+    <form onSubmit={handleExplore} className={styles.form}>
+      <div className={styles.inputWrapper}>
+        <span className={styles.inputIcon}>🔍</span>
+        <input
+          type="text"
+          value={explorerKw}
+          onChange={e => setExplorerKw(e.target.value)}
+          placeholder="ej: implantes dentales, ortodoncia..."
+          required
+          className={styles.urlInput}
+          disabled={explorerLoading}
+        />
+      </div>
+      <div className={styles.formControls}>
+        <select value={explorerCountry} onChange={e => setExplorerCountry(e.target.value)} className={styles.select}>
+          {EXPLORER_COUNTRIES.map(c => <option key={c.code} value={c.code}>{c.label}</option>)}
+        </select>
+        <select value={explorerLimit} onChange={e => setExplorerLimit(Number(e.target.value))} className={styles.select}>
+          <option value={30}>30 ideas</option>
+          <option value={50}>50 ideas</option>
+          <option value={100}>100 ideas</option>
+          <option value={200}>200 ideas</option>
+        </select>
+        <button type="submit" disabled={explorerLoading || !explorerKw.trim()} className={compact ? styles.analyzeBtnSm : styles.analyzeBtn}>
+          {explorerLoading ? '⏳ Buscando...' : '🔍 Explorar'}
+        </button>
+      </div>
+    </form>
+  );
+
+  const renderExplorerContent = () => {
+    const explorerFiltered = explorerResult
+      ? explorerResult.keywords.filter(kw => {
+          if (explorerSubTab === 'questions') return kw.category === 'question';
+          if (explorerSubTab === 'comparisons') return kw.category === 'comparison';
+          if (explorerSubTab === 'related') return kw.category === 'related';
+          return true;
+        })
+      : [];
+    const qCount = explorerResult ? explorerResult.keywords.filter(k => k.category === 'question').length : 0;
+    const cmpCount = explorerResult ? explorerResult.keywords.filter(k => k.category === 'comparison').length : 0;
+    const relCount = explorerResult ? explorerResult.keywords.filter(k => k.category === 'related').length : 0;
+    const getKdClass = (kd: number) => kd >= 60 ? 'kdHigh' : kd >= 30 ? 'kdMed' : 'kdLow';
+
+    return (
+      <>
+        {explorerError === 'not_configured' && (
+          <div className={styles.errorBox}>
+            <span>🔑</span>
+            <div>
+              <strong>Ahrefs API no configurada</strong>
+              <p style={{ margin: '0.25rem 0 0', fontSize: '0.9rem' }}>
+                Configura <code>AHREFS_API_KEY</code> en las variables de entorno para usar el Explorador de Keywords.
+              </p>
+            </div>
+          </div>
+        )}
+        {explorerError && explorerError !== 'not_configured' && (
+          <div className={styles.errorBox}><span>❌</span><div><strong>Error:</strong> {explorerError}</div></div>
+        )}
+        {explorerLoading && (
+          <div className={styles.loadingCard} style={{ padding: '2rem' }}>
+            <div className={styles.loadingSpinner}></div>
+            <p className={styles.loadingText}>Buscando ideas para <strong>"{explorerKw}"</strong></p>
+            <p className={styles.loadingHint}>Consultando Ahrefs Keywords Explorer...</p>
+          </div>
+        )}
+        {!explorerResult && !explorerLoading && !explorerError && (
+          <div className={styles.explorerEmptyState}>
+            <div className={styles.explorerEmptyIcon}>🔍</div>
+            <div className={styles.explorerEmptyTitle}>Busca ideas de keywords</div>
+            <div className={styles.explorerEmptyDesc}>
+              Escribe una keyword semilla y descubre ideas relacionadas con volumen, CPC y dificultad real.
+            </div>
+          </div>
+        )}
+        {explorerResult && !explorerLoading && (
+          <>
+            {explorerResult.overview && (
+              <div className={styles.explorerOverviewCard}>
+                <div className={styles.explorerOverviewTitle}>
+                  <span>📊</span> Métricas de <strong>"{explorerResult.seed}"</strong>
+                </div>
+                <div className={styles.explorerOverviewStats}>
+                  <div className={styles.explorerOverviewStat}>
+                    <span className={styles.explorerOverviewNum}>{explorerResult.overview.volume.toLocaleString()}</span>
+                    <span className={styles.explorerOverviewLbl}>Búsquedas/mes</span>
+                  </div>
+                  <div className={styles.explorerOverviewStat}>
+                    <span className={styles.explorerOverviewNum}>{explorerResult.overview.cpcEur.toFixed(2)}€</span>
+                    <span className={styles.explorerOverviewLbl}>CPC estimado</span>
+                  </div>
+                  <div className={styles.explorerOverviewStat}>
+                    <span className={`${styles.explorerOverviewNum} ${styles[getKdClass(explorerResult.overview.difficulty)]}`}>
+                      {explorerResult.overview.difficulty}
+                    </span>
+                    <span className={styles.explorerOverviewLbl}>Dificultad (KD)</span>
+                  </div>
+                  <div className={styles.explorerOverviewStat}>
+                    <span className={styles.explorerOverviewNum}>{explorerResult.overview.trafficPotential.toLocaleString()}</span>
+                    <span className={styles.explorerOverviewLbl}>Tráfico potencial</span>
+                  </div>
+                </div>
+              </div>
+            )}
+            <div className={styles.explorerSubTabs}>
+              <button className={explorerSubTab === 'all' ? styles.explorerSubTabActive : styles.explorerSubTab} onClick={() => setExplorerSubTab('all')}>
+                Todas <span className={styles.explorerSubTabCount}>{explorerResult.keywords.length}</span>
+              </button>
+              {qCount > 0 && (
+                <button className={explorerSubTab === 'questions' ? styles.explorerSubTabActive : styles.explorerSubTab} onClick={() => setExplorerSubTab('questions')}>
+                  ❓ Preguntas <span className={styles.explorerSubTabCount}>{qCount}</span>
+                </button>
+              )}
+              {cmpCount > 0 && (
+                <button className={explorerSubTab === 'comparisons' ? styles.explorerSubTabActive : styles.explorerSubTab} onClick={() => setExplorerSubTab('comparisons')}>
+                  💰 Comparativas <span className={styles.explorerSubTabCount}>{cmpCount}</span>
+                </button>
+              )}
+              {relCount > 0 && (
+                <button className={explorerSubTab === 'related' ? styles.explorerSubTabActive : styles.explorerSubTab} onClick={() => setExplorerSubTab('related')}>
+                  🔗 También rankan <span className={styles.explorerSubTabCount}>{relCount}</span>
+                </button>
+              )}
+            </div>
+            <div className={styles.card}>
+              <div className={styles.tableWrapper}>
+                <table className={styles.table}>
+                  <thead>
+                    <tr>
+                      <th className={styles.thNum}>#</th>
+                      <th>Keyword</th>
+                      <th>Volumen</th>
+                      <th>CPC</th>
+                      <th>Dificultad</th>
+                      <th>Tráf. Pot.</th>
+                      <th>Tipo</th>
+                      <th></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {explorerFiltered.map((kw, idx) => {
+                      const cat = CAT_META[kw.category];
+                      return (
+                        <tr key={idx} className={styles.tableRow}>
+                          <td className={styles.rowNum}>{idx + 1}</td>
+                          <td className={styles.kwCell}>
+                            <div className={styles.kwText}>{kw.keyword}</div>
+                          </td>
+                          <td className={styles.numCell}>{kw.volume.toLocaleString()}</td>
+                          <td className={styles.numCell}>{kw.cpcEur > 0 ? `${kw.cpcEur.toFixed(2)}€` : '—'}</td>
+                          <td>
+                            <span className={`${styles.kdBadge} ${styles[getKdClass(kw.difficulty)]}`}>
+                              {kw.difficulty}
+                            </span>
+                          </td>
+                          <td className={styles.numCell}>{kw.trafficPotential > 0 ? kw.trafficPotential.toLocaleString() : '—'}</td>
+                          <td>
+                            <span className={styles.catBadge} style={{ color: cat.color, background: cat.bg, borderColor: cat.border }}>
+                              {cat.emoji} {cat.label}
+                            </span>
+                          </td>
+                          <td>
+                            <button
+                              className={styles.drillBtn}
+                              onClick={() => drillIntoKeyword(kw.keyword)}
+                              title={`Explorar "${kw.keyword}"`}
+                            >
+                              🔍
+                            </button>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+              <div className={styles.tableFooter}>
+                {explorerFiltered.length} keywords · Ahrefs Keywords Explorer · {explorerResult.country}
+              </div>
+            </div>
+          </>
+        )}
+      </>
+    );
+  };
+
+  const isExplorerPage = heroMode === 'kw' && !result && !loading &&
+    (explorerResult !== null || explorerLoading || explorerError !== '');
+
   return (
     <div className={styles.app}>
 
-      {/* Compact header: solo visible cuando hay resultados o está cargando */}
-      {(result || loading) && (
+      {/* Header: visible en resultados URL o en página del explorador */}
+      {(result || loading || isExplorerPage) && (
         <header className={styles.header}>
           <div className={styles.headerInner}>
             <span className={styles.logoIcon}>🦷</span>
@@ -334,14 +626,22 @@ export default function Home() {
               <h1 className={styles.title}>KW ReWoodSearch</h1>
               <p className={styles.subtitle}>Mejor herramienta de análisis de keywords de España</p>
             </div>
+            {isExplorerPage && !result && (
+              <button
+                className={styles.headerSwitchBtn}
+                onClick={() => { setHeroMode('url'); setExplorerResult(null); setExplorerBreadcrumb([]); setExplorerError(''); }}
+              >
+                🌐 Analizar URL
+              </button>
+            )}
           </div>
         </header>
       )}
 
-      <main className={result || loading ? styles.main : styles.mainHero}>
+      <main className={(result || loading || isExplorerPage) ? styles.main : styles.mainHero}>
 
         {/* HERO: pantalla de inicio sin resultados */}
-        {!result && !loading && (
+        {!result && !loading && !isExplorerPage && (
           <>
             {/* Fondo animado */}
             <div className={styles.heroBg} aria-hidden="true">
@@ -359,20 +659,70 @@ export default function Home() {
               <div className={styles.heroLogo}>🦷</div>
               <h1 className={styles.heroTitle}>KW ReWoodSearch</h1>
               <p className={styles.heroSubtitle}>
-                Descubre las keywords con más potencial de cualquier web dental en España
+                {heroMode === 'url'
+                  ? 'Descubre las keywords con más potencial de cualquier web dental en España'
+                  : 'Busca el volumen, CPC y dificultad de cualquier keyword y explora ideas relacionadas'
+                }
               </p>
               <div className={styles.heroCard}>
-                {searchForm(false)}
+                {/* Mode switcher */}
+                <div className={styles.heroModeSwitcher}>
+                  <button
+                    type="button"
+                    onClick={() => setHeroMode('url')}
+                    className={heroMode === 'url' ? styles.heroModeActive : styles.heroMode}
+                  >
+                    🌐 Analizar URL
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setHeroMode('kw')}
+                    className={heroMode === 'kw' ? styles.heroModeActive : styles.heroMode}
+                  >
+                    🔍 Explorar Keywords
+                  </button>
+                </div>
+                {heroMode === 'url' ? searchForm(false) : explorerSearchForm(false)}
               </div>
             </div>
           </>
         )}
 
-        {/* Búsqueda compacta cuando hay resultados */}
+        {/* Búsqueda compacta URL cuando hay resultados */}
         {(result || loading) && (
           <div className={styles.searchCard}>
             {searchForm(true)}
           </div>
+        )}
+
+        {/* STANDALONE EXPLORER PAGE */}
+        {isExplorerPage && !result && !loading && (
+          <>
+            {/* Compact explorer search */}
+            <div className={styles.searchCard}>
+              {explorerSearchForm(true)}
+            </div>
+
+            {/* Breadcrumb */}
+            {explorerBreadcrumb.length > 0 && (
+              <div className={styles.explorerBreadcrumb}>
+                <button className={styles.explorerBreadcrumbBtn} onClick={() => navigateBreadcrumb(-1)}>🏠 Inicio</button>
+                {explorerBreadcrumb.map((kw, i) => (
+                  <span key={i} className={styles.explorerBreadcrumbItem}>
+                    <span className={styles.explorerBreadcrumbSep}>›</span>
+                    <button className={styles.explorerBreadcrumbBtn} onClick={() => navigateBreadcrumb(i)}>{kw}</button>
+                  </span>
+                ))}
+                <span className={styles.explorerBreadcrumbSep}>›</span>
+                <span className={styles.explorerBreadcrumbCurrent}>{explorerResult?.seed || explorerKw}</span>
+              </div>
+            )}
+
+            {/* Explorer content */}
+            <div className={styles.explorerSection}>
+              {renderExplorerContent()}
+            </div>
+          </>
         )}
 
         {error && (
@@ -448,6 +798,12 @@ export default function Home() {
                 onClick={() => setActiveTab('domain')}
               >
                 🏠 Dominio {domainStatsLoading ? '⏳' : domainStats ? '' : ''}
+              </button>
+              <button
+                className={activeTab === 'explorer' ? styles.tabActive : styles.tab}
+                onClick={() => setActiveTab('explorer')}
+              >
+                🔍 Explorador
               </button>
             </div>
 
@@ -866,6 +1222,37 @@ export default function Home() {
                     </div>
                   );
                 })()}
+              </div>
+            )}
+
+            {activeTab === 'explorer' && (
+              <div className={styles.explorerSection}>
+                {/* Search Form (tab version) */}
+                <div className={styles.explorerFormCard}>
+                  <div className={styles.explorerFormHeader}>
+                    <span className={styles.explorerFormIcon}>🔍</span>
+                    <div>
+                      <div className={styles.explorerFormTitle}>Explorador de Keywords</div>
+                      <div className={styles.explorerFormSubtitle}>Descubre nuevas ideas con volumen, CPC y dificultad real de Ahrefs</div>
+                    </div>
+                  </div>
+                  {explorerSearchForm(false)}
+                </div>
+                {/* Breadcrumb when drilling */}
+                {explorerBreadcrumb.length > 0 && (
+                  <div className={styles.explorerBreadcrumb}>
+                    <button className={styles.explorerBreadcrumbBtn} onClick={() => navigateBreadcrumb(-1)}>🏠 Inicio</button>
+                    {explorerBreadcrumb.map((kw, i) => (
+                      <span key={i} className={styles.explorerBreadcrumbItem}>
+                        <span className={styles.explorerBreadcrumbSep}>›</span>
+                        <button className={styles.explorerBreadcrumbBtn} onClick={() => navigateBreadcrumb(i)}>{kw}</button>
+                      </span>
+                    ))}
+                    <span className={styles.explorerBreadcrumbSep}>›</span>
+                    <span className={styles.explorerBreadcrumbCurrent}>{explorerResult?.seed || explorerKw}</span>
+                  </div>
+                )}
+                {renderExplorerContent()}
               </div>
             )}
 

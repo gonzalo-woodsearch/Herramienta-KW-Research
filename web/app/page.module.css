@@ -787,6 +787,312 @@
 .subfolderTraffic { font-size: 0.78rem; font-weight: 700; color: #374151; min-width: 50px; text-align: right; }
 .subfolderPages { font-size: 0.72rem; color: #94a3b8; min-width: 25px; }
 
+/* ─── HEADER SWITCH BUTTON ───────────────────────────────────────────────── */
+.headerSwitchBtn {
+  padding: 0.45rem 1.1rem;
+  background: rgba(255,255,255,0.12);
+  border: 1.5px solid rgba(255,255,255,0.3);
+  border-radius: 0.625rem;
+  color: white;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s;
+}
+.headerSwitchBtn:hover { background: rgba(255,255,255,0.22); }
+
+/* ─── HERO MODE SWITCHER ─────────────────────────────────────────────────── */
+.heroModeSwitcher {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+  background: rgba(99,102,241,0.06);
+  border: 1px solid rgba(99,102,241,0.15);
+  border-radius: 0.875rem;
+  padding: 0.375rem;
+}
+.heroMode {
+  flex: 1;
+  padding: 0.6rem 1rem;
+  background: transparent;
+  border: none;
+  border-radius: 0.625rem;
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.heroMode:hover { color: #4f46e5; background: rgba(99,102,241,0.06); }
+.heroModeActive {
+  flex: 1;
+  padding: 0.6rem 1rem;
+  background: white;
+  border: none;
+  border-radius: 0.625rem;
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #4f46e5;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(79,70,229,0.18), 0 1px 3px rgba(0,0,0,0.08);
+}
+
+/* ─── EXPLORER BREADCRUMB ────────────────────────────────────────────────── */
+.explorerBreadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  flex-wrap: wrap;
+  padding: 0.6rem 1rem;
+  background: white;
+  border-radius: 0.75rem;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+  font-size: 0.85rem;
+}
+.explorerBreadcrumbBtn {
+  background: none;
+  border: none;
+  color: #4f46e5;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0.1rem 0.25rem;
+  border-radius: 0.25rem;
+  transition: background 0.12s;
+}
+.explorerBreadcrumbBtn:hover { background: #eff6ff; }
+.explorerBreadcrumbItem { display: flex; align-items: center; gap: 0.25rem; }
+.explorerBreadcrumbSep { color: #cbd5e1; font-size: 0.9rem; }
+.explorerBreadcrumbCurrent { color: #1e293b; font-weight: 700; font-size: 0.85rem; }
+
+/* ─── DRILL BUTTON ───────────────────────────────────────────────────────── */
+.drillBtn {
+  background: none;
+  border: 1.5px solid #e0e7ff;
+  border-radius: 0.375rem;
+  color: #6366f1;
+  cursor: pointer;
+  font-size: 0.82rem;
+  padding: 0.18rem 0.45rem;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.drillBtn:hover {
+  background: #eff6ff;
+  border-color: #6366f1;
+  transform: scale(1.05);
+}
+
+/* ─── KEYWORDS EXPLORER ──────────────────────────────────────────────────── */
+.explorerSection { display: flex; flex-direction: column; gap: 1rem; }
+
+/* Form card */
+.explorerFormCard {
+  background: white;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+  border-top: 4px solid #4f46e5;
+}
+.explorerFormHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+.explorerFormIcon { font-size: 1.75rem; }
+.explorerFormTitle { font-size: 1.05rem; font-weight: 700; color: #1e293b; }
+.explorerFormSubtitle { font-size: 0.82rem; color: #64748b; margin-top: 0.1rem; }
+
+.explorerForm { display: flex; flex-direction: column; gap: 0.75rem; }
+.explorerInputWrapper {
+  display: flex;
+  align-items: center;
+  border: 2px solid #e0e7ff;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  background: white;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.explorerInputWrapper:focus-within {
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 3px rgba(79,70,229,0.1);
+}
+.explorerInputIcon { padding: 0 0.75rem; font-size: 1rem; color: #6366f1; }
+.explorerInput {
+  flex: 1;
+  padding: 0.875rem 0.5rem;
+  border: none;
+  outline: none;
+  font-size: 0.98rem;
+  color: #1e293b;
+  background: transparent;
+}
+.explorerInput::placeholder { color: #94a3b8; }
+.explorerInput:disabled { opacity: 0.6; }
+
+.explorerControls {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+.explorerSelect {
+  padding: 0.7rem 1rem;
+  border: 2px solid #e0e7ff;
+  border-radius: 0.75rem;
+  font-size: 0.9rem;
+  background: white;
+  color: #374151;
+  cursor: pointer;
+  flex: 1;
+}
+.explorerBtn {
+  padding: 0.7rem 2rem;
+  background: linear-gradient(135deg, #4f46e5, #7c3aed);
+  color: white;
+  font-size: 0.95rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  white-space: nowrap;
+  box-shadow: 0 3px 12px rgba(79,70,229,0.3);
+  transition: box-shadow 0.2s, transform 0.15s;
+}
+.explorerBtn:hover:not(:disabled) {
+  box-shadow: 0 5px 18px rgba(79,70,229,0.45);
+  transform: translateY(-1px);
+}
+.explorerBtn:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
+
+/* Overview card */
+.explorerOverviewCard {
+  background: linear-gradient(135deg, #f5f3ff 0%, #eff6ff 100%);
+  border: 1px solid #e0e7ff;
+  border-radius: 1rem;
+  padding: 1.25rem 1.5rem;
+}
+.explorerOverviewTitle {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #475569;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.explorerOverviewStats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+}
+.explorerOverviewStat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: white;
+  border-radius: 0.75rem;
+  padding: 0.875rem 0.5rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+}
+.explorerOverviewNum {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: #4f46e5;
+  line-height: 1;
+}
+.explorerOverviewLbl { font-size: 0.75rem; color: #64748b; margin-top: 0.35rem; font-weight: 500; text-align: center; }
+
+/* KD difficulty */
+.kdBadge {
+  display: inline-block;
+  padding: 0.2rem 0.65rem;
+  border-radius: 0.375rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+.kdLow  { background: #dcfce7; color: #15803d; }
+.kdMed  { background: #fef9c3; color: #a16207; }
+.kdHigh { background: #fee2e2; color: #b91c1c; }
+
+/* KD num in overview inherits color from kdLow/Med/High */
+.explorerOverviewStat .kdLow  { background: none; color: #15803d; }
+.explorerOverviewStat .kdMed  { background: none; color: #f59e0b; }
+.explorerOverviewStat .kdHigh { background: none; color: #ef4444; }
+
+/* Category badge */
+.catBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.22rem 0.65rem;
+  border-radius: 9999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  white-space: nowrap;
+  border: 1px solid;
+}
+
+/* Sub-tabs */
+.explorerSubTabs {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+.explorerSubTab {
+  padding: 0.5rem 1.1rem;
+  background: white;
+  border: 2px solid #e2e8f0;
+  border-radius: 0.625rem;
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.explorerSubTab:hover { border-color: #4f46e5; color: #4f46e5; }
+.explorerSubTabActive {
+  padding: 0.5rem 1.1rem;
+  background: #4f46e5;
+  border: 2px solid #4f46e5;
+  border-radius: 0.625rem;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.explorerSubTabCount {
+  background: rgba(0,0,0,0.15);
+  border-radius: 9999px;
+  padding: 0.1rem 0.45rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+.explorerSubTabActive .explorerSubTabCount { background: rgba(255,255,255,0.25); }
+
+/* Empty state */
+.explorerEmptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  background: white;
+  border-radius: 1rem;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+  text-align: center;
+}
+.explorerEmptyIcon { font-size: 3.5rem; margin-bottom: 1rem; opacity: 0.4; }
+.explorerEmptyTitle { font-size: 1.1rem; font-weight: 700; color: #1e293b; margin-bottom: 0.5rem; }
+.explorerEmptyDesc { font-size: 0.9rem; color: #64748b; max-width: 380px; line-height: 1.6; }
+
 /* RESPONSIVE */
 @media (max-width: 900px) {
   .statsGrid { grid-template-columns: repeat(2, 1fr); }
@@ -799,4 +1105,6 @@
   .filterBar { flex-direction: column; align-items: flex-start; }
   .domainTwoCol { grid-template-columns: 1fr; }
   .domainMetricsRow { flex-direction: column; }
+  .explorerOverviewStats { grid-template-columns: repeat(2, 1fr); }
+  .explorerControls { flex-direction: column; }
 }
