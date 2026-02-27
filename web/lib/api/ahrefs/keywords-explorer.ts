@@ -1,8 +1,13 @@
 /**
  * DataForSEO Keywords Explorer
- * Uses /dataforseo_labs/google/keyword_suggestions/live
- * - seed_keyword_data  → overview metrics for the seed
- * - items              → related keyword ideas
+ *
+ * Overview:  /keywords_data/google_ads/search_volume/live
+ *            → exact volume, CPC, competition for the seed keyword
+ *
+ * Ideas:     /keywords_data/google_ads/keywords_for_keywords/live
+ *            → Google Keyword Planner ideas (broader, more diverse)
+ *
+ * Both run in parallel.
  */
 
 import DataForSEOClient from '../dataforseo/client';
@@ -47,21 +52,14 @@ export interface ExplorerResult {
   keywords: ExplorerKeyword[];
 }
 
-interface DfsKwInfo {
+// Raw item shape returned by Google Ads endpoints
+interface GadsItem {
+  keyword?: string;
   search_volume?: number;
   cpc?: number;
   competition?: number;
   competition_level?: string;
-}
-
-interface DfsKwProps {
-  keyword_difficulty?: number;
-}
-
-interface DfsItem {
-  keyword?: string;
-  keyword_info?: DfsKwInfo;
-  keyword_properties?: DfsKwProps;
+  monthly_searches?: unknown[];
 }
 
 interface DfsResponse {
@@ -70,15 +68,7 @@ interface DfsResponse {
   tasks?: Array<{
     status_code: number;
     status_message: string;
-    result?: Array<{
-      seed_keyword?: string;
-      seed_keyword_data?: {
-        keyword_info?: DfsKwInfo;
-        keyword_properties?: DfsKwProps;
-      };
-      items_count?: number;
-      items?: DfsItem[];
-    }>;
+    result?: any[];
   }>;
 }
 
@@ -91,18 +81,26 @@ function categorize(keyword: string): KwCategory {
   return 'idea';
 }
 
+// Map competition_level to a 0-100 difficulty proxy
+function compToDifficulty(level?: string): number {
+  if (level === 'HIGH') return 75;
+  if (level === 'MEDIUM') return 45;
+  if (level === 'LOW') return 15;
+  return 0;
+}
+
 function toCpc(usd: number): number {
   return Math.round(usd * 10) / 10;
 }
 
-function mapItem(item: DfsItem, defaultCat: KwCategory): ExplorerKeyword | null {
+function mapGadsItem(item: GadsItem, defaultCat: KwCategory): ExplorerKeyword | null {
   if (!item.keyword) return null;
   const cat = categorize(item.keyword);
   return {
     keyword: item.keyword,
-    volume: item.keyword_info?.search_volume || 0,
-    cpcEur: toCpc(item.keyword_info?.cpc || 0),
-    difficulty: item.keyword_properties?.keyword_difficulty || 0,
+    volume: item.search_volume || 0,
+    cpcEur: toCpc(item.cpc || 0),
+    difficulty: compToDifficulty(item.competition_level),
     trafficPotential: 0,
     category: (cat === 'question' || cat === 'comparison') ? cat : defaultCat,
   };
@@ -119,8 +117,60 @@ export class KeywordsExplorerService {
     return GEO_MAP[country.toUpperCase()] ?? GEO_MAP['ES'];
   }
 
+  /** Exact metrics for the seed keyword */
+  private async fetchOverview(seed: string, country: string): Promise<SeedOverview | null> {
+    const geo = this.getGeo(country);
+    const res = await this.client.post<DfsResponse>(
+      '/keywords_data/google_ads/search_volume/live',
+      [{
+        keywords: [seed],
+        location_code: geo.location_code,
+        language_code: geo.language_code,
+      }]
+    );
+
+    if (res.status_code !== 20000) throw new Error(`search_volume: ${res.status_message}`);
+    const task = res.tasks?.[0];
+    if (!task || task.status_code !== 20000) throw new Error(`Task: ${task?.status_message}`);
+
+    // result is a flat array of keyword objects
+    const items: GadsItem[] = task.result || [];
+    const item = items.find(i => i.keyword?.toLowerCase() === seed.toLowerCase()) ?? items[0];
+    if (!item) return null;
+
+    return {
+      keyword: item.keyword ?? seed,
+      volume: item.search_volume || 0,
+      cpcEur: toCpc(item.cpc || 0),
+      difficulty: compToDifficulty(item.competition_level),
+      trafficPotential: 0,
+    };
+  }
+
+  /** Broader keyword ideas via Google Keyword Planner */
+  private async fetchIdeas(seed: string, country: string, limit: number): Promise<GadsItem[]> {
+    const geo = this.getGeo(country);
+    const res = await this.client.post<DfsResponse>(
+      '/keywords_data/google_ads/keywords_for_keywords/live',
+      [{
+        keywords: [seed],
+        location_code: geo.location_code,
+        language_code: geo.language_code,
+        limit,
+        order_by: 'search_volume,desc',
+      }]
+    );
+
+    if (res.status_code !== 20000) throw new Error(`keywords_for_keywords: ${res.status_message}`);
+    const task = res.tasks?.[0];
+    if (!task || task.status_code !== 20000) throw new Error(`Task: ${task?.status_message}`);
+
+    // result[0].items contains the ideas
+    return task.result?.[0]?.items ?? [];
+  }
+
   async explore(seed: string, country = 'ES', limit = 50): Promise<ExplorerResult> {
-    const cacheKey = `dfs:explorer:${seed.toLowerCase().trim()}:${country}:${limit}`;
+    const cacheKey = `dfs2:explorer:${seed.toLowerCase().trim()}:${country}:${limit}`;
     const cached = cache.get<ExplorerResult>(cacheKey);
     if (cached) {
       logger.info(`Using cached explorer data for "${seed}"`);
@@ -128,68 +178,38 @@ export class KeywordsExplorerService {
     }
 
     logger.info(`Keywords Explorer: searching "${seed}" in ${country} (limit: ${limit})`);
-    const geo = this.getGeo(country);
 
-    let overview: SeedOverview | null = null;
+    const [overviewRes, ideasRes] = await Promise.allSettled([
+      this.fetchOverview(seed, country),
+      this.fetchIdeas(seed, country, limit),
+    ]);
+
+    if (overviewRes.status === 'rejected') {
+      logger.warn(`Overview failed for "${seed}": ${overviewRes.reason}`);
+    }
+    if (ideasRes.status === 'rejected') {
+      logger.warn(`Ideas failed for "${seed}": ${ideasRes.reason}`);
+    }
+
+    const overview = overviewRes.status === 'fulfilled' ? overviewRes.value : null;
+    const rawIdeas = ideasRes.status === 'fulfilled' ? ideasRes.value : [];
+
+    const seen = new Set<string>([seed.toLowerCase().trim()]);
     const keywords: ExplorerKeyword[] = [];
 
-    try {
-      const res = await this.client.post<DfsResponse>(
-        '/dataforseo_labs/google/keyword_suggestions/live',
-        [{
-          keyword: seed,
-          location_code: geo.location_code,
-          language_code: geo.language_code,
-          limit,
-          order_by: ['keyword_info.search_volume,desc'],
-          include_seed_keyword: true,
-        }]
-      );
-
-      if (res.status_code !== 20000) {
-        throw new Error(`DataForSEO error ${res.status_code}: ${res.status_message}`);
-      }
-
-      const task = res.tasks?.[0];
-      if (!task || task.status_code !== 20000) {
-        throw new Error(`Task error: ${task?.status_message || 'unknown'}`);
-      }
-
-      const r0 = task.result?.[0];
-      if (!r0) throw new Error('Empty result from DataForSEO');
-
-      // Extract overview from seed_keyword_data
-      const seedData = r0.seed_keyword_data;
-      if (seedData?.keyword_info) {
-        overview = {
-          keyword: seed,
-          volume: seedData.keyword_info.search_volume || 0,
-          cpcEur: toCpc(seedData.keyword_info.cpc || 0),
-          difficulty: seedData.keyword_properties?.keyword_difficulty || 0,
-          trafficPotential: 0,
-        };
-      }
-
-      // Build keyword ideas from items
-      const seen = new Set<string>([seed.toLowerCase().trim()]);
-      for (const item of r0.items ?? []) {
-        if (!item.keyword) continue;
-        const norm = item.keyword.toLowerCase().trim();
-        if (seen.has(norm)) continue;
-        seen.add(norm);
-        const kw = mapItem(item, 'idea');
-        if (kw) keywords.push(kw);
-      }
-
-      keywords.sort((a, b) => b.volume - a.volume);
-    } catch (e: any) {
-      logger.warn(`Keywords Explorer failed for "${seed}": ${e.message}`);
-      // Return what we have so far (may be empty)
+    for (const item of rawIdeas) {
+      if (!item.keyword) continue;
+      const norm = item.keyword.toLowerCase().trim();
+      if (seen.has(norm)) continue;
+      seen.add(norm);
+      const kw = mapGadsItem(item, 'idea');
+      if (kw) keywords.push(kw);
     }
+
+    keywords.sort((a, b) => b.volume - a.volume);
 
     const result: ExplorerResult = { seed, country, overview, keywords };
 
-    // Only cache if we got useful data
     if (overview || keywords.length > 0) {
       cache.set(cacheKey, result, config.ahrefs.cacheTtl);
     }
