@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
 
     const result = await keywordsExplorerService.explore(keyword.trim(), country, limit);
 
-    console.log(`[keywords-explorer] Found ${result.keywords.length} keyword ideas`);
+    console.log(`[keywords-explorer] Found ${result.keywords.length} keyword ideas, overview: ${JSON.stringify(result.overview)}`);
 
     return NextResponse.json(result);
   } catch (error: any) {
