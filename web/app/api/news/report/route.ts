@@ -1,16 +1,28 @@
 import { NextRequest, NextResponse } from 'next/server';
-import Anthropic from '@anthropic-ai/sdk';
 import { fetchCategory } from '@/lib/news/rss';
 import { loadTelegramStore, saveReport, loadReport } from '@/lib/news/store';
 import { NewsReport, SectionData, TelegramSectionData, NewsItem, TelegramMessage } from '@/lib/news/types';
 
-const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+const HAS_ANTHROPIC = !!process.env.ANTHROPIC_API_KEY;
+
+// Lazy client — only instantiated when API key is present
+function getClient() {
+  if (!HAS_ANTHROPIC) return null;
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const Anthropic = require('@anthropic-ai/sdk').default;
+  return new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+}
 
 // ─── Summarize a list of news items with Claude ─────────────────────────────
 
 async function summarizeNews(items: NewsItem[], topic: string): Promise<string> {
   if (items.length === 0) {
-    return `No se encontraron noticias recientes sobre ${topic}. Prueba a generar el reporte más tarde o configura una API key de Anthropic.`;
+    return `No se encontraron noticias recientes sobre ${topic}.`;
+  }
+
+  // Without API key — return a clean headline list
+  if (!HAS_ANTHROPIC) {
+    return items.slice(0, 5).map(i => `• ${i.title} — ${i.source}`).join('\n');
   }
 
   const digest = items.slice(0, 8).map((item, i) =>
@@ -18,6 +30,7 @@ async function summarizeNews(items: NewsItem[], topic: string): Promise<string> 
   ).join('\n\n');
 
   try {
+    const client = getClient()!;
     const msg = await client.messages.create({
       model: 'claude-haiku-4-5-20251001',
       max_tokens: 600,
@@ -60,7 +73,13 @@ async function summarizeTelegram(messages: TelegramMessage[], groupName: string)
     .map(m => `[${new Date(m.date).toLocaleDateString('es-ES')}] ${m.sender}: ${m.text.substring(0, 300)}`)
     .join('\n---\n');
 
+  // Without API key — return raw messages preview
+  if (!HAS_ANTHROPIC) {
+    return recent.slice(0, 5).map(m => `• [${m.sender}]: ${m.text.substring(0, 150)}`).join('\n');
+  }
+
   try {
+    const client = getClient()!;
     const msg = await client.messages.create({
       model: 'claude-haiku-4-5-20251001',
       max_tokens: 800,

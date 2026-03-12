@@ -292,6 +292,7 @@ export default function NoticiasPage() {
   const [initialLoading, setInitialLoading] = useState(true);
   const [error, setError] = useState('');
   const [lastGenerated, setLastGenerated] = useState<string | null>(null);
+  const [hasAI, setHasAI] = useState(true);
 
   // Load cached report on mount
   useEffect(() => {
@@ -301,6 +302,9 @@ export default function NoticiasPage() {
         if (data.report) {
           setReport(data.report);
           setLastGenerated(data.report.generatedAt);
+          // Detect if AI summaries are present (more than just bullet headlines)
+          const sample = data.report.ia?.general?.summary || '';
+          setHasAI(sample.length > 100 && !sample.startsWith('•'));
         }
       })
       .catch(() => {})
@@ -320,8 +324,10 @@ export default function NoticiasPage() {
       const data = await res.json();
       setReport(data.report);
       setLastGenerated(data.report.generatedAt);
+      const sample = data.report.ia?.general?.summary || '';
+      setHasAI(sample.length > 100 && !sample.startsWith('•'));
     } catch (e) {
-      setError('Error generando el reporte. Verifica tu ANTHROPIC_API_KEY en el archivo .env.');
+      setError('Error generando el reporte. Comprueba tu conexión a internet.');
     } finally {
       setLoading(false);
     }
@@ -541,6 +547,18 @@ export default function NoticiasPage() {
         ) : (
           /* Report content */
           <div>
+            {/* No AI key banner */}
+            {!hasAI && (
+              <div style={{ background: '#fffbeb', border: '1px solid #fcd34d', borderRadius: '12px', padding: '12px 16px', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '10px', fontSize: '13px', color: '#92400e' }}>
+                <span style={{ fontSize: '18px' }}>💡</span>
+                <div>
+                  <strong>Modo sin IA:</strong> Las noticias se muestran sin resúmenes automáticos.
+                  Para activar los resúmenes añade <code style={{ background: '#fef3c7', padding: '1px 5px', borderRadius: '3px' }}>ANTHROPIC_API_KEY</code> en tus variables de entorno.
+                  Obtén una gratis en <strong>console.anthropic.com</strong> (5$ de crédito inicial, ~$0.02 por reporte).
+                </div>
+              </div>
+            )}
+
             {/* Week banner */}
             <div style={{ background: 'linear-gradient(135deg, #f0f9ff, #ecfdf5)', border: '1px solid #bae6fd', borderRadius: '12px', padding: '14px 18px', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '10px' }}>
               <span style={{ fontSize: '18px' }}>📅</span>
