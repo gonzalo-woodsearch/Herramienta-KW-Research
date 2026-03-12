@@ -5,7 +5,7 @@ const nextConfig = {
       bodySizeLimit: '2mb',
     },
   },
-  // API routes timeout set to 60 seconds (max for Vercel hobby)
+  // Allow external RSS feeds to be fetched from API routes
   async headers() {
     return [
       {

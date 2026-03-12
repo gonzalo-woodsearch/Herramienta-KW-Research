@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
+import Link from 'next/link';
 import styles from './page.module.css';
 
 type LocalLevel = 'none' | 'national' | 'regional' | 'city' | 'neighborhood' | 'ultralocal';
@@ -634,6 +635,21 @@ export default function Home() {
                 🌐 Analizar URL
               </button>
             )}
+            <Link
+              href="/noticias"
+              style={{
+                padding: '8px 16px',
+                background: 'linear-gradient(135deg, #7c3aed, #2563eb)',
+                color: '#fff',
+                textDecoration: 'none',
+                borderRadius: '8px',
+                fontWeight: 700,
+                fontSize: '13px',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              📰 News IA & SEO
+            </Link>
           </div>
         </header>
       )}
@@ -683,6 +699,26 @@ export default function Home() {
                   </button>
                 </div>
                 {heroMode === 'url' ? searchForm(false) : explorerSearchForm(false)}
+              </div>
+              <div style={{ textAlign: 'center', marginTop: '18px' }}>
+                <Link
+                  href="/noticias"
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    padding: '10px 22px',
+                    background: 'linear-gradient(135deg, #7c3aed, #2563eb)',
+                    color: '#fff',
+                    textDecoration: 'none',
+                    borderRadius: '10px',
+                    fontWeight: 700,
+                    fontSize: '14px',
+                    boxShadow: '0 4px 14px rgba(124,58,237,0.4)',
+                  }}
+                >
+                  📰 News IA & SEO Local
+                </Link>
               </div>
             </div>
           </>

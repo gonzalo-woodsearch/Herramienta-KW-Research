@@ -33,3 +33,12 @@ coverage/
 # Output directories
 output/
 test-output/
+
+# News data (local cache, not for version control)
+web/data/
+data/
+
+# Next.js
+web/.next/
+web/tsconfig.tsbuildinfo
+web/next-env.d.ts
