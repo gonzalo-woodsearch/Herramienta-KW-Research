@@ -10,108 +10,82 @@
 </head>
 <body>
   <div class="app">
-    <header>
+    <header class="hero">
       <div>
-        <p class="meta">Móvil + escritorio</p>
-        <h1>AHORRO APP</h1>
-        <p class="subtitle">Control diario de gastos, ahorro y reporte rápido</p>
+        <p class="meta">Gestión de gastos</p>
+        <h1>Tu Ahorro Inteligente</h1>
+        <p class="subtitle">Controla tu dinero como una app store</p>
       </div>
-      <div class="badge">Tu asesor financiero</div>
+      <div class="badge">🚀 En ruta a 1.000 €</div>
     </header>
 
+    <section class="card grid-3">
+      <article class="tile tile-purple"><span>💰 Ingreso</span><strong id="savings">0 €</strong><small>Objetivo ahorro</small></article>
+      <article class="tile tile-blue"><span>📉 Gastos</span><strong id="totalExpense">0 €</strong><small>Este mes</small></article>
+      <article class="tile tile-green"><span>📊 Progreso</span><strong id="progressPct">0%</strong><small>Meta mensual</small></article>
+    </section>
+
+    <section class="card actions">
+      <button class="action-btn">+ Añadir gasto</button>
+      <button class="action-btn">🏦 Ajustar metas</button>
+      <button class="action-btn">📄 Reporte</button>
+    </section>
+
     <section class="card">
-      <h2>1) Ajusta tus metas</h2>
+      <div class="section-header"><h2>Presupuesto</h2><span>Ver y actualizar</span></div>
       <div class="form-grid">
-        <label>Ingreso mensual
-          <input id="income" type="number" value="1280" min="0">
-        </label>
-        <label>Gastos fijos
-          <input id="fixed" type="number" value="134" min="0">
-        </label>
-        <label>Presupuesto variable
-          <input id="variableBudget" type="number" value="250" min="0">
-        </label>
-        <label>Objetivo ahorro
-          <input id="goal" type="number" value="700" min="0">
-        </label>
+        <label>Ingreso mensual<input id="income" type="number" value="1280" min="0"></label>
+        <label>Gastos fijos<input id="fixed" type="number" value="134" min="0"></label>
+        <label>Variable<input id="variableBudget" type="number" value="250" min="0"></label>
+        <label>Objetivo ahorro<input id="goal" type="number" value="700" min="0"></label>
       </div>
     </section>
 
     <section class="card">
-      <h2>2) Resumen mensual</h2>
+      <div class="section-header"><h2>Resultado mensual</h2><span>Tu saldo final</span></div>
       <div class="stats-grid">
-        <div class="stat"><span>Ahorro planificado</span><strong id="savings">0 €</strong></div>
-        <div class="stat"><span>Disponible tras gastos</span><strong id="available">0 €</strong></div>
-        <div class="stat"><span>Lo gastado (total)</span><strong id="totalExpense">0 €</strong></div>
-        <div class="stat"><span>Presupuesto variable restante</span><strong id="remainingVariable">0 €</strong></div>
-        <div class="stat" style="grid-column:1 / -1;"><span>Progreso objetivo</span>
-          <div class="progress"><div id="bar" class="progress-bar"></div></div>
-          <small id="progressText"></small>
-        </div>
+        <div class="stat"><span>Ahorro proyectado</span><strong id="savings2">0 €</strong></div>
+        <div class="stat"><span>Disponible</span><strong id="available">0 €</strong></div>
+        <div class="stat"><span>Variable restante</span><strong id="remainingVariable">0 €</strong></div>
       </div>
+      <div class="progress-block"><small>Progreso restante</small><div class="progress"><div id="bar" class="progress-bar"></div></div><small id="progressText"></small></div>
     </section>
 
     <section class="card">
-      <h2>3) Plan 6 meses</h2>
+      <div class="section-header"><h2>Gasto rápido</h2><small>Registra en segundos</small></div>
       <div class="form-grid">
-        <label>Meta 6 meses
-          <input id="sixMonthGoal" type="number" value="4200" min="0">
-        </label>
-        <label>Ahorro mensual objetivo
-          <input id="monthlyTarget" type="number" value="700" min="0">
-        </label>
+        <label>Categoría<select id="category"><option>Ocio</option><option>Comida</option><option>Gasolina</option><option>Ropa</option><option>Otro</option></select></label>
+        <label>Monto<input id="amount" type="number" value="20" min="0"></label>
+        <label>Nota<input id="note" type="text" placeholder="Cena, ropa..."></label>
+        <label>Fecha<input id="date" type="date"></label>
+      </div>
+      <div class="form-grid" style="margin-top:10px;">
+        <label>Meta 6 meses<input id="sixMonthGoal" type="number" value="4200" min="0"></label>
+        <label>Ahorro mensual<input id="monthlyTarget" type="number" value="700" min="0"></label>
       </div>
       <div class="stats-grid" style="margin-top:8px;">
-        <div class="stat"><span>Acumulado 6 meses</span><strong id="sixMonthSavings">0 €</strong></div>
-        <div class="stat"><span>Progreso 6 meses</span><strong id="sixMonthProgress">0 %</strong></div>
+        <div class="stat"><span>6m ahorro</span><strong id="sixMonthSavings">0 €</strong></div>
+        <div class="stat"><span>Progreso 6m</span><strong id="sixMonthProgress">0 %</strong></div>
       </div>
-    </section>
-
-    <section class="card">
-      <h2>4) Checklist semanal</h2>
-      <div class="checklist" id="checklist"></div>
-      <div class="row"><button id="addTask" type="button">Añadir tarea</button><button id="clearTasks" type="button">Borrar tareas</button></div>
-    </section>
-
-    <section class="card">
-      <h2>5) Añade gasto</h2>
-      <div class="form-grid">
-        <label>Categoría
-          <select id="category"><option>Ocio</option><option>Comida</option><option>Gasolina</option><option>Ropa</option><option>Otro</option></select>
-        </label>
-        <label>Monto
-          <input id="amount" type="number" value="20" min="0">
-        </label>
-        <label>Nota
-          <input id="note" type="text" placeholder="Ej. cena con amigos">
-        </label>
-        <label>Fecha
-          <input id="date" type="date">
-        </label>
-      </div>
-      <div class="row"><button id="save">Guardar gasto</button><button id="clear">Borrar registros</button></div>
+      <div class="row"><button id="save">Guardar gasto</button><button id="clear">Limpiar</button></div>
       <p id="message" class="message"></p>
     </section>
 
     <section class="card">
-      <div class="row"><h2>4) Gastos registrados</h2><span id="count">0 gastos</span></div>
+      <div class="section-header"><h2>Gastos recientes</h2><span id="count">0 gastos</span></div>
       <div id="records" class="records"></div>
     </section>
 
     <section class="card">
-      <h2>5) Reporte rápido</h2>
-      <textarea id="report" readonly></textarea>
-      <button id="copy">Copiar reporte</button>
+      <div class="section-header"><h2>Check semanal</h2><span>Mantén disciplina</span></div>
+      <div class="checklist" id="checklist"></div>
+      <div class="row"><button id="addTask" type="button">Añadir</button><button id="clearTasks" type="button">Borrar</button></div>
     </section>
 
-    <section class="card advice">
-      <h3>Consejos clave</h3>
-      <ul>
-        <li>Transfiere tu ahorro automático el día de nómina.</li>
-        <li>Registra gastos todos los días (3 min).</li>
-        <li>Revisa semanalmente y ajusta el ocio.</li>
-        <li>Empieza inversión con 50€ al mes cuando tu fondo esté en 2.000€.</li>
-      </ul>
+    <section class="card">
+      <div class="section-header"><h2>Reporte</h2><span>Copiar y compartir</span></div>
+      <textarea id="report" readonly></textarea>
+      <button id="copy">Copiar reporte</button>
     </section>
   </div>
 
