@@ -31,6 +31,7 @@ const params = {
   checklist: document.querySelector('#checklist'),
   addTask: document.querySelector('#addTask'),
   clearTasks: document.querySelector('#clearTasks'),
+  newTask: document.querySelector('#newTask'),
   goAdd: document.querySelector('#goAdd'),
   goMeta: document.querySelector('#goMeta'),
   goReport: document.querySelector('#goReport')
@@ -145,9 +146,19 @@ function addRecord() {
 
 function clearRecords() { state.records = []; params.message.textContent = 'Registros borrados'; setTimeout(() => { params.message.textContent = ''; }, 1400); render(); }
 
-function addTask() { const text = prompt('Nueva tarea semanal'); if (!text) return; state.tasks.push({ id: `${Date.now()}-${Math.random().toString(36).slice(2, 4)}`, text, done: false }); render(); }
+function addTask() {
+  const text = params.newTask?.value?.trim();
+  if (!text) {
+    params.message.textContent = 'Escribe la tarea antes de añadir';
+    setTimeout(() => { params.message.textContent = ''; }, 1400);
+    return;
+  }
+  state.tasks.push({ id: `${Date.now()}-${Math.random().toString(36).slice(2, 4)}`, text, done: false });
+  params.newTask.value = '';
+  render();
+}
 
-function clearTasks() { state.tasks = []; render(); }
+function clearTasks() { state.tasks = []; params.message.textContent = 'Checklist vacía'; setTimeout(() => { params.message.textContent = ''; }, 1400); render(); }
 
 function toggleTask(id, done) { state.tasks = state.tasks.map(t => t.id === id ? { ...t, done } : t); render(); }
 
