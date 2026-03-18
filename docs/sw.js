@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ahorro-app-cache-v1';
+const CACHE_NAME = 'ahorro-app-cache-v2';
 const FILES_TO_CACHE = ['/', '/index.html', '/styles.css', '/app.js', '/manifest.json'];
 
 self.addEventListener('install', (event) => {
