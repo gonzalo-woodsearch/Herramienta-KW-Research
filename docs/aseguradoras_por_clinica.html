@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aseguradoras por Clínica — Cleardent</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --teal:#00B5A3; --teal-dark:#007A6E; --navy:#0D2333;
+  --off:#F4F7F9; --white:#fff; --border:#DDE8EC; --muted:#7A97A4;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'DM Sans',sans-serif;background:var(--off);color:var(--navy);font-size:14px;line-height:1.6}
+
+header{background:var(--navy);padding:44px 60px 36px;position:relative;overflow:hidden}
+header::before{content:'';position:absolute;top:-80px;right:-80px;width:340px;height:340px;border-radius:50%;background:radial-gradient(circle,rgba(0,181,163,.14) 0%,transparent 70%)}
+header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--teal),transparent)}
+.htag{font-family:'Syne',sans-serif;font-size:10.5px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:var(--teal);margin-bottom:10px;display:block}
+header h1{font-family:'Syne',sans-serif;font-size:clamp(24px,3.5vw,44px);font-weight:800;color:#fff;line-height:1.1;margin-bottom:14px}
+header h1 span{color:var(--teal)}
+.meta{display:flex;gap:14px;flex-wrap:wrap}
+.pill{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:100px;padding:5px 14px;font-size:12px;color:rgba(255,255,255,.65);display:flex;align-items:center;gap:7px}
+.pill strong{color:#fff}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--teal);flex-shrink:0}
+
+.search-bar{background:var(--white);border-bottom:1px solid var(--border);padding:12px 60px;position:sticky;top:0;z-index:100;display:flex;gap:12px;align-items:center}
+.search-bar input{flex:1;padding:8px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:'DM Sans',sans-serif;color:var(--navy);background:var(--off);outline:none;transition:border-color .2s}
+.search-bar input:focus{border-color:var(--teal);background:#fff}
+.search-bar input::placeholder{color:var(--muted)}
+.search-info{font-size:12px;color:var(--muted);white-space:nowrap}
+
+.container{max-width:960px;margin:0 auto;padding:36px 40px 72px}
+
+.clinic-block{margin-bottom:38px;padding-bottom:38px;border-bottom:2px solid var(--border)}
+.clinic-block:last-child{border-bottom:none}
+
+.clinic-title{font-family:'Syne',sans-serif;font-size:17px;font-weight:800;color:var(--navy);margin-bottom:4px;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.clinic-count{font-size:12px;color:var(--muted);font-weight:400;font-family:'DM Sans',sans-serif}
+.clinic-divider{width:40px;height:3px;background:var(--teal);border-radius:2px;margin:10px 0 14px}
+
+.aseg-label{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--teal-dark);display:inline;margin-right:6px}
+.aseg-text{display:inline;font-size:13.5px;color:#334455;line-height:1.75}
+
+.copy-btn{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:600;color:var(--teal);background:none;border:1px solid var(--teal);border-radius:6px;padding:3px 10px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s;margin-left:8px;vertical-align:middle;flex-shrink:0}
+.copy-btn:hover{background:var(--teal);color:#fff}
+.copy-btn.copied{background:#16a34a;border-color:#16a34a;color:#fff}
+
+.clipboard{position:absolute;left:-9999px;top:-9999px}
+
+footer{background:var(--navy);padding:22px 60px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
+footer p{font-size:11px;color:rgba(255,255,255,.38)}
+footer strong{color:var(--teal)}
+
+@media print{
+  .search-bar,.copy-btn{display:none!important}
+  .clinic-block{break-inside:avoid}
+  header{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+@media(max-width:640px){
+  header,.search-bar,footer{padding-left:20px;padding-right:20px}
+  .container{padding:24px 18px 48px}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <span class="htag">Cleardent · Dirección de Operaciones</span>
+  <h1>Aseguradoras por <span>Clínica</span></h1>
+  <div class="meta">
+    <div class="pill"><span class="dot"></span><strong>69</strong>&nbsp;clínicas</div>
+    <div class="pill"><span class="dot"></span><strong>846</strong>&nbsp;aseguradoras activas registradas</div>
+    <div class="pill"><span class="dot"></span>Marzo 2026</div>
+  </div>
+</header>
+
+<div class="search-bar">
+  <input type="text" id="search" placeholder="🔍  Buscar clínica o aseguradora..." />
+  <span class="search-info" id="search-info">69 clínicas</span>
+</div>
+
+<div class="container" id="main-container"></div>
+<textarea class="clipboard" id="clipboard-area"></textarea>
+
+<footer>
+  <p>Fuente: <strong>Aseguradoras Activas por Clínicas — Marzo 2026</strong></p>
+  <p>El buscador filtra por nombre de clínica o por nombre de aseguradora</p>
+</footer>
+
+<script>
+const DATA = {"JAÉN": ["SANTALUCÍA (Clave por sociedad)", "SERVIALL", "ATOCHA (ORALPRIMA)", "OCCIDENT", "DENTYRED", "GIRA DENTAL", "UNIVERSALUD", "ADE (Clave llega a clínica)", "ODONTOGROUP", "DKV  (Clave llega a clínica)", "CH SALUD", "COYSALUD", "AURA SEGUROS", "FUTURE HEALTHCARE", "CUSTOMEDIC", "MONTEPÍO CONDUCTORES"], "TORREDONJIMENO": ["SANTALUCÍA (Clave por sociedad)", "SERVIALL", "ATOCHA (ORALPRIMA)", "OCCIDENT", "DENTYRED", "GIRA DENTAL", "UNIVERSALUD", "ADE (Clave llega a clínica)", "ODONTOGROUP", "ADESLAS", "DKV  (Clave llega a clínica)", "CH SALUD", "COYSALUD", "ASSSA SEGUROS (CHIP CARD)", "AURA SEGUROS", "FUTURE HEALTHCARE", "CUSTOMEDIC", "MONTEPÍO CONDUCTORES"], "LINARES": ["SANTALUCÍA (Clave por sociedad)", "SERVIALL", "ATOCHA (ORALPRIMA)", "OCCIDENT", "DENTYRED", "UNIVERSALUD", "ADE (Clave llega a clínica)", "ODONTOGROUP", "DKV  (Clave llega a clínica)", "CH SALUD", "COYSALUD", "ASSSA SEGUROS (CHIP CARD)", "AURA SEGUROS", "FUTURE HEALTHCARE", "CUSTOMEDIC", "MONTEPÍO CONDUCTORES"], "ANDÚJAR": ["SANTALUCÍA (Clave por sociedad)", "SERVIALL", "ATOCHA (ORALPRIMA)", "OCCIDENT", "DENTYRED", "GIRA DENTAL", "UNIVERSALUD", "ADE (Clave llega a clínica)", "ODONTOGROUP", "DKV  (Clave llega a clínica)", "CH SALUD", "COYSALUD", "AURA SEGUROS", "FUTURE HEALTHCARE", "CUSTOMEDIC", "MONTEPÍO CONDUCTORES"], "ALCALÁ LA REAL": ["SANTALUCÍA (Clave por sociedad)", "SERVIALL", "ATOCHA (ORALPRIMA)", "OCCIDENT", "DENTYRED", "UNIVERSALUD", "ADE (Clave llega a clínica)", "ODONTOGROUP", "DKV  (Clave llega a clínica)", "CH SALUD", "COYSALUD", "ASSSA SEGUROS (CHIP CARD)", "AURA SEGUROS", "FUTURE HEALTHCARE", "CUSTOMEDIC", "MONTEPÍO CONDUCTORES"], "BUJALANCE": ["SANTALUCÍA (Clave por sociedad)", "SERVIALL", "ATOCHA (ORALPRIMA)", "OCCIDENT", "DENTYRED", "GIRA DENTAL", "UNIVERSALUD", "ADE (Clave llega a clínica)", "ODONTOGROUP", "DKV  (Clave llega a clínica)", "CH SALUD", "COYSALUD", "ASSSA SEGUROS (CHIP CARD)", "AURA SEGUROS", "FUTURE HEALTHCARE", "CUSTOMEDIC", "MONTEPÍO CONDUCTORES"], "PRIEGO DE CÓRDOBA": ["SANTALUCÍA (Clave por sociedad)", "SERVIALL", "ATOCHA (ORALPRIMA)", "OCCIDENT", "DENTYRED", "UNIVERSALUD", "ADE (Clave llega a clínica)", "ODONTOGROUP", "DKV  (Clave llega a clínica)", "CH SALUD", "COYSALUD", "AURA SEGUROS", "FUTURE HEALTHCARE", "CUSTOMEDIC", "MONTEPÍO CONDUCTORES"], "MARTOS": ["SANTALUCÍA (Clave por sociedad)", "SERVIALL", "ATOCHA (ORALPRIMA)", "OCCIDENT", "DENTYRED", "UNIVERSALUD", "ADE (Clave llega a clínica)", "ODONTOGROUP", "DKV  (Clave llega a clínica)", "CH SALUD", "COYSALUD", "ASSSA SEGUROS (CHIP CARD)", "AURA SEGUROS", "FUTURE HEALTHCARE", "CUSTOMEDIC", "MONTEPÍO CONDUCTORES"], "MENGIBAR": ["SANTALUCÍA (Clave por sociedad)", "SERVIALL", "ATOCHA (ORALPRIMA)", "OCCIDENT", "DENTYRED", "UNIVERSALUD", "ADE (Clave llega a clínica)", "ODONTOGROUP", "DKV  (Clave llega a clínica)", "CH SALUD", "COYSALUD", "ASSSA SEGUROS (CHIP CARD)", "AURA SEGUROS", "FUTURE HEALTHCARE", "CUSTOMEDIC", "MONTEPÍO CONDUCTORES"], "BAZA": ["SANTALUCÍA (Clave por sociedad)", "SERVIALL", "ATOCHA (ORALPRIMA)", "OCCIDENT", "DENTYRED", "UNIVERSALUD", "ADE (Clave llega a clínica)", "ODONTOGROUP", "DKV  (Clave llega a clínica)", "MAPFRE", "CH SALUD", "COYSALUD", "ASSSA SEGUROS (CHIP CARD)", "AURA SEGUROS", "FUTURE HEALTHCARE", "CUSTOMEDIC", "MONTEPÍO CONDUCTORES"], "LOJA": ["SANTALUCÍA (Clave por sociedad)", "SERVIALL", "ATOCHA (ORALPRIMA)", "OCCIDENT", "DENTYRED", "UNIVERSALUD", "ADE (Clave llega a clínica)", "ODONTOGROUP", "DKV  (Clave llega a clínica)", "CH SALUD", "COYSALUD", "ASSSA SEGUROS (CHIP CARD)", "AURA SEGUROS", "FUTURE HEALTHCARE", "CUSTOMEDIC", "MONTEPÍO CONDUCTORES"], "ÍLLORA": ["SANTALUCÍA (Clave por sociedad)", "SERVIALL", "ATOCHA (ORALPRIMA)", "OCCIDENT", "DENTYRED", "UNIVERSALUD", "ADE (Clave llega a clínica)", "ODONTOGROUP", "DKV  (Clave llega a clínica)", "CH SALUD", "COYSALUD", "ASSSA SEGUROS (CHIP CARD)", "AURA SEGUROS", "FUTURE HEALTHCARE", "CUSTOMEDIC", "MONTEPÍO CONDUCTORES"], "MONTORO": ["SANTALUCÍA (Clave por sociedad)", "SERVIALL", "ATOCHA (ORALPRIMA)", "OCCIDENT", "DENTYRED", "UNIVERSALUD", "ADE (Clave llega a clínica)", "ODONTOGROUP", "DKV  (Clave llega a clínica)", "CH SALUD", "COYSALUD", "ASSSA SEGUROS (CHIP CARD)", "AURA SEGUROS", "FUTURE HEALTHCARE", "CUSTOMEDIC", "MONTEPÍO CONDUCTORES"], "LA PUEBLA": ["SANTALUCÍA (Clave por sociedad)", "SERVIALL", "ATOCHA (ORALPRIMA)", "OCCIDENT", "DENTYRED", "UNIVERSALUD", "ADE (Clave llega a clínica)", "ODONTOGROUP", "DKV  (Clave llega a clínica)", "CH SALUD", "COYSALUD", "ASSSA SEGUROS (CHIP CARD)", "AURA SEGUROS", "FUTURE HEALTHCARE", "CUSTOMEDIC", "MONTEPÍO CONDUCTORES"], "MARCHENA": ["SANTALUCÍA (Clave por sociedad)", "SERVIALL", "ATOCHA (ORALPRIMA)", "OCCIDENT", "DENTYRED", "UNIVERSALUD", "ADE (Clave llega a clínica)", "ODONTOGROUP", "DKV  (Clave llega a clínica)", "CH SALUD", "COYSALUD", "ASSSA SEGUROS (CHIP CARD)", "AURA SEGUROS", "FUTURE HEALTHCARE", "CUSTOMEDIC", "MONTEPÍO CONDUCTORES"], "UTRERA": ["SANTALUCÍA (Clave por sociedad)", "SERVIALL", "ATOCHA (ORALPRIMA)", "OCCIDENT", "DENTYRED", "UNIVERSALUD", "ADE (Clave llega a clínica)", "ODONTOGROUP", "DKV  (Clave llega a clínica)", "MAPFRE", "CH SALUD", "COYSALUD", "ASSSA SEGUROS (CHIP CARD)", "AURA SEGUROS", "FUTURE HEALTHCARE", "CUSTOMEDIC", "MONTEPÍO CONDUCTORES"], "PALMA DEL RÍO": ["SANTALUCÍA (Clave por sociedad)", "SERVIALL", "ATOCHA (ORALPRIMA)", "OCCIDENT", "DENTYRED", "UNIVERSALUD", "ADE (Clave llega a clínica)", "ODONTOGROUP", "DKV  (Clave llega a clínica)", "CH SALUD", "COYSALUD", "ASSSA SEGUROS (CHIP CARD)", "AURA SEGUROS", "FUTURE HEALTHCARE", "CUSTOMEDIC", "MONTEPÍO CONDUCTORES"], "SALOBREÑA": ["SANTALUCÍA (Clave por sociedad)", "SERVIALL", "ATOCHA (ORALPRIMA)", "OCCIDENT", "DENTYRED", "UNIVERSALUD", "ADE (Clave llega a clínica)", "ODONTOGROUP", "DKV  (Clave llega a clínica)", "CH SALUD", "COYSALUD", "ASSSA SEGUROS (CHIP CARD)", "AURA SEGUROS", "FUTURE HEALTHCARE", "CUSTOMEDIC", "MONTEPÍO CONDUCTORES"], "OSUNA": ["SANTALUCÍA (Clave por sociedad)", "SERVIALL", "ATOCHA (ORALPRIMA)", "OCCIDENT", "DENTYRED", "UNIVERSALUD", "ADE (Clave llega a clínica)", "ODONTOGROUP", "DKV  (Clave llega a clínica)", "SONO IO DENTAL (PORTAL MK)", "CH SALUD", "COYSALUD", "ASSSA SEGUROS (CHIP CARD)", "AURA SEGUROS", "FUTURE HEALTHCARE", "CUSTOMEDIC", "MONTEPÍO CONDUCTORES"], "LOS PALACIOS": [], "ALMERIMAR": ["SANTALUCÍA (Clave por sociedad)", "SERVIALL", "ATOCHA (ORALPRIMA)", "OCCIDENT", "DENTYRED", "UNIVERSALUD", "ADE (Clave llega a clínica)", "ODONTOGROUP", "DKV  (Clave llega a clínica)", "SONO IO DENTAL (PORTAL MK)", "MAPFRE", "CH SALUD", "COYSALUD", "AURA SEGUROS", "FUTURE HEALTHCARE", "CUSTOMEDIC", "MONTEPÍO CONDUCTORES"], "GARRUCHA": ["SANTALUCÍA (Clave por sociedad)", "SERVIALL", "ATOCHA (ORALPRIMA)", "OCCIDENT", "DENTYRED", "UNIVERSALUD", "ADE (Clave llega a clínica)", "ODONTOGROUP", "DKV  (Clave llega a clínica)", "MAPFRE", "CH SALUD", "COYSALUD", "AURA SEGUROS", "FUTURE HEALTHCARE", "CUSTOMEDIC", "MONTEPÍO CONDUCTORES"], "ARAHAL": ["SANTALUCÍA (Clave por sociedad)", "SERVIALL", "ATOCHA (ORALPRIMA)", "OCCIDENT", "DENTYRED", "UNIVERSALUD", "ADE (Clave llega a clínica)", "ODONTOGROUP", "DKV  (Clave llega a clínica)", "CH SALUD", "COYSALUD", "ASSSA SEGUROS (CHIP CARD)", "AURA SEGUROS", "FUTURE HEALTHCARE", "CUSTOMEDIC", "MONTEPÍO CONDUCTORES"], "TOMARES": ["SANTALUCÍA (Clave por sociedad)", "SERVIALL", "ATOCHA (ORALPRIMA)", "OCCIDENT", "DENTYRED", "UNIVERSALUD", "ADE (Clave llega a clínica)", "ODONTOGROUP", "CH SALUD", "COYSALUD", "ASSSA SEGUROS (CHIP CARD)", "AURA SEGUROS", "FUTURE HEALTHCARE", "CUSTOMEDIC", "MONTEPÍO CONDUCTORES"], "ALMUÑECAR": ["SANTALUCÍA (Clave por sociedad)", "SERVIALL", "ATOCHA (ORALPRIMA)", "OCCIDENT", "DENTYRED", "UNIVERSALUD", "ADE (Clave llega a clínica)", "ODONTOGROUP", "DKV  (Clave llega a clínica)", "SONO IO DENTAL (PORTAL MK)", "CH SALUD", "COYSALUD", "AURA SEGUROS", "FUTURE HEALTHCARE", "CUSTOMEDIC", "MONTEPÍO CONDUCTORES"], "ROQUETAS DE MAR": ["SANTALUCÍA (Clave por sociedad)", "SERVIALL", "ATOCHA (ORALPRIMA)", "OCCIDENT", "DENTYRED", "UNIVERSALUD", "ADE (Clave llega a clínica)", "ODONTOGROUP", "DKV  (Clave llega a clínica)", "SONO IO DENTAL (PORTAL MK)", "CH SALUD", "COYSALUD", "AURA SEGUROS", "FUTURE HEALTHCARE", "CUSTOMEDIC", "MONTEPÍO CONDUCTORES"], "ALBOLOTE": ["SANTALUCÍA (Clave por sociedad)", "SERVIALL", "ATOCHA (ORALPRIMA)", "OCCIDENT", "DENTYRED", "UNIVERSALUD", "ADE (Clave llega a clínica)", "ODONTOGROUP", "DKV  (Clave llega a clínica)", "SONO IO DENTAL (PORTAL MK)", "CH SALUD", "COYSALUD", "AURA SEGUROS", "FUTURE HEALTHCARE", "CUSTOMEDIC", "MONTEPÍO CONDUCTORES"], "TORRE DEL MAR": ["SANTALUCÍA (Clave por sociedad)", "SERVIALL", "ATOCHA (ORALPRIMA)", "OCCIDENT", "DENTYRED", "UNIVERSALUD", "ADE (Clave llega a clínica)", "ODONTOGROUP", "DKV  (Clave llega a clínica)", "SONO IO DENTAL (PORTAL MK)", "CH SALUD", "COYSALUD", "ASSSA SEGUROS (CHIP CARD)", "AURA SEGUROS", "FUTURE HEALTHCARE", "CUSTOMEDIC", "MONTEPÍO CONDUCTORES"], "SAN FERNANDO": ["SANTALUCÍA (Clave por sociedad)", "SERVIALL", "ATOCHA (ORALPRIMA)", "OCCIDENT", "DENTYRED", "UNIVERSALUD", "ADE (Clave llega a clínica)", "ODONTOGROUP", "DKV  (Clave llega a clínica)", "SONO IO DENTAL (PORTAL MK)", "CH SALUD", "COYSALUD", "AURA SEGUROS", "FUTURE HEALTHCARE", "CUSTOMEDIC", "MONTEPÍO CONDUCTORES"], "VERA": ["SANTALUCÍA (Clave por sociedad)", "SERVIALL", "ATOCHA (ORALPRIMA)", "OCCIDENT", "DENTYRED", "UNIVERSALUD", "ADE (Clave llega a clínica)", "ODONTOGROUP", "DKV  (Clave llega a clínica)", "CH SALUD", "COYSALUD", "AURA SEGUROS", "FUTURE HEALTHCARE", "CUSTOMEDIC", "MONTEPÍO CONDUCTORES"], "HUÉRCAL-OVERA": ["SANTALUCÍA (Clave por sociedad)", "SERVIALL", "ATOCHA (ORALPRIMA)", "OCCIDENT", "DENTYRED", "UNIVERSALUD", "ADE (Clave llega a clínica)", "ODONTOGROUP", "DKV  (Clave llega a clínica)", "CH SALUD", "COYSALUD", "AURA SEGUROS", "FUTURE HEALTHCARE", "CUSTOMEDIC", "MONTEPÍO CONDUCTORES"], "CARMONA": ["SANTALUCÍA (Clave por sociedad)", "SERVIALL", "ATOCHA (ORALPRIMA)", "OCCIDENT", "DENTYRED", "UNIVERSALUD", "ADE (Clave llega a clínica)", "ODONTOGROUP", "CH SALUD", "COYSALUD", "ASSSA SEGUROS (CHIP CARD)", "AURA SEGUROS", "FUTURE HEALTHCARE", "CUSTOMEDIC", "MONTEPÍO CONDUCTORES"], "ALMERIA": ["SANTALUCÍA (Clave por sociedad)", "SERVIALL", "ATOCHA (ORALPRIMA)", "OCCIDENT", "DENTYRED", "UNIVERSALUD", "ADE (Clave llega a clínica)", "ODONTOGROUP", "DKV  (Clave llega a clínica)", "MAPFRE", "CH SALUD", "COYSALUD", "AURA SEGUROS", "FUTURE HEALTHCARE", "CUSTOMEDIC", "MONTEPÍO CONDUCTORES"], "GRANADA": ["SANTALUCÍA (Clave por sociedad)", "SERVIALL", "ATOCHA (ORALPRIMA)", "OCCIDENT", "DENTYRED", "UNIVERSALUD", "ADE (Clave llega a clínica)", "ODONTOGROUP", "CH SALUD", "COYSALUD", "AURA SEGUROS", "FUTURE HEALTHCARE", "CUSTOMEDIC", "MONTEPÍO CONDUCTORES"], "CORDOBA": ["SANTALUCÍA (Clave por sociedad)", "SERVIALL", "ATOCHA (ORALPRIMA)", "OCCIDENT", "DENTYRED", "UNIVERSALUD", "ADE (Clave llega a clínica)", "ODONTOGROUP", "CH SALUD", "COYSALUD", "AURA SEGUROS", "FUTURE HEALTHCARE", "CUSTOMEDIC", "MONTEPÍO CONDUCTORES"], "SANLÚCAR": ["SANTALUCÍA (Clave por sociedad)", "SERVIALL", "ATOCHA (ORALPRIMA)", "OCCIDENT", "DENTYRED", "UNIVERSALUD", "ADE (Clave llega a clínica)", "ODONTOGROUP", "DKV  (Clave llega a clínica)", "CH SALUD", "COYSALUD", "AURA SEGUROS", "FUTURE HEALTHCARE", "CUSTOMEDIC", "MONTEPÍO CONDUCTORES"], "SEVILLA": ["SANTALUCÍA (Clave por sociedad)", "SERVIALL", "ATOCHA (ORALPRIMA)", "OCCIDENT", "DENTYRED", "UNIVERSALUD", "ADE (Clave llega a clínica)", "ODONTOGROUP", "CH SALUD", "COYSALUD", "AURA SEGUROS", "FUTURE HEALTHCARE", "CUSTOMEDIC", "MONTEPÍO CONDUCTORES"], "MÁLAGA": ["SANTALUCÍA (Clave por sociedad)", "SERVIALL", "ATOCHA (ORALPRIMA)", "OCCIDENT", "UNIVERSALUD", "ADE (Clave llega a clínica)", "ODONTOGROUP", "CH SALUD", "COYSALUD", "AURA SEGUROS", "FUTURE HEALTHCARE", "CUSTOMEDIC", "MONTEPÍO CONDUCTORES"], "MÁLAGA II": ["SANTALUCÍA (Clave por sociedad)", "SERVIALL", "ATOCHA (ORALPRIMA)", "OCCIDENT", "DENTYRED", "UNIVERSALUD", "ADE (Clave llega a clínica)", "ODONTOGROUP", "CH SALUD", "COYSALUD", "ASSSA SEGUROS (CHIP CARD)", "AURA SEGUROS", "FUTURE HEALTHCARE", "CUSTOMEDIC", "MONTEPÍO CONDUCTORES"], "GRANADA II": ["SANTALUCÍA (Clave por sociedad)", "SERVIALL", "ATOCHA (ORALPRIMA)", "OCCIDENT", "DENTYRED", "UNIVERSALUD", "ADE (Clave llega a clínica)", "ODONTOGROUP", "CH SALUD", "COYSALUD", "ASSSA SEGUROS (CHIP CARD)", "AURA SEGUROS", "FUTURE HEALTHCARE", "CUSTOMEDIC", "MONTEPÍO CONDUCTORES"], "DÚRCAL": ["SANTALUCÍA (Clave por sociedad)", "SERVIALL", "ATOCHA (ORALPRIMA)", "OCCIDENT", "DENTYRED", "UNIVERSALUD", "ADE (Clave llega a clínica)", "ODONTOGROUP", "CH SALUD", "COYSALUD", "ASSSA SEGUROS (CHIP CARD)", "AURA SEGUROS", "FUTURE HEALTHCARE", "CUSTOMEDIC", "MONTEPÍO CONDUCTORES"], "NERJA": ["SANTALUCÍA (Clave por sociedad)", "SERVIALL", "ATOCHA (ORALPRIMA)", "OCCIDENT", "UNIVERSALUD", "ADE (Clave llega a clínica)", "ODONTOGROUP", "CH SALUD", "COYSALUD", "ASSSA SEGUROS (CHIP CARD)", "AURA SEGUROS", "FUTURE HEALTHCARE", "CUSTOMEDIC", "MONTEPÍO CONDUCTORES"], "VILLA DEL RÍO": ["SANTALUCÍA (Clave por sociedad)", "SERVIALL", "ATOCHA (ORALPRIMA)", "OCCIDENT", "DENTYRED", "UNIVERSALUD", "ADE (Clave llega a clínica)", "ODONTOGROUP", "CH SALUD", "COYSALUD", "ASSSA SEGUROS (CHIP CARD)", "AURA SEGUROS", "FUTURE HEALTHCARE", "CUSTOMEDIC", "MONTEPÍO CONDUCTORES"], "BCN-VILADOMAT": ["SANTALUCÍA (Clave por sociedad)", "SERVIALL", "ATOCHA (ORALPRIMA)", "OCCIDENT", "UNIVERSALUD", "ODONTOGROUP", "CH SALUD", "COYSALUD", "AURA SEGUROS", "FUTURE HEALTHCARE", "MONTEPÍO CONDUCTORES"], "FUENGIROLA": ["SANTALUCÍA (Clave por sociedad)", "SERVIALL", "ATOCHA (ORALPRIMA)", "OCCIDENT", "DENTYRED", "UNIVERSALUD", "ADE (Clave llega a clínica)", "ODONTOGROUP", "CH SALUD", "COYSALUD", "AURA SEGUROS", "CUSTOMEDIC", "MONTEPÍO CONDUCTORES"], "BCN-JOAN GÜELL": [], "TORREJÓN DE ARDOZ": ["SANTALUCÍA (Clave por sociedad)", "SERVIALL", "ATOCHA (ORALPRIMA)", "OCCIDENT", "DENTYRED", "ADE (Clave llega a clínica)", "ODONTOGROUP", "CH SALUD", "AURA SEGUROS"], "BCN-ARAGÓ": ["SANTALUCÍA (Clave por sociedad)", "SERVIALL", "ATOCHA (ORALPRIMA)", "OCCIDENT", "DENTYRED", "ODONTOGROUP", "CH SALUD", "AURA SEGUROS"], "SAN SEBASTIÁN DE LOS REYES": ["SANTALUCÍA (Clave por sociedad)", "SERVIALL", "ATOCHA (ORALPRIMA)", "OCCIDENT", "DENTYRED", "ODONTOGROUP", "CH SALUD", "AURA SEGUROS"], "ALHAMA DE MURCIA": ["SANTALUCÍA (Clave por sociedad)", "SERVIALL", "ATOCHA (ORALPRIMA)", "OCCIDENT", "DENTYRED", "ADE (Clave llega a clínica)", "ODONTOGROUP", "CH SALUD", "COYSALUD", "ASSSA SEGUROS (CHIP CARD)", "AURA SEGUROS", "FUTURE HEALTHCARE"], "CHICLANA DE LA FRONTERA": ["SANTALUCÍA (Clave por sociedad)", "SERVIALL", "ATOCHA (ORALPRIMA)", "OCCIDENT", "DENTYRED", "ADE (Clave llega a clínica)", "ODONTOGROUP", "CH SALUD", "AURA SEGUROS", "FUTURE HEALTHCARE"], "GÓJAR": ["SANTALUCÍA (Clave por sociedad)", "SERVIALL", "ATOCHA (ORALPRIMA)", "OCCIDENT", "CH SALUD", "AURA SEGUROS", "FUTURE HEALTHCARE"], "ALBACETE": ["SANTALUCÍA (Clave por sociedad)", "SERVIALL", "OCCIDENT", "DENTYRED", "ADE (Clave llega a clínica)", "CH SALUD", "AURA SEGUROS", "FUTURE HEALTHCARE"], "ADRA": ["SANTALUCÍA (Clave por sociedad)", "SERVIALL", "ATOCHA (ORALPRIMA)", "OCCIDENT", "DENTYRED", "ODONTOGROUP", "CH SALUD", "AURA SEGUROS"], "DR. ESQUERDO": ["SANTALUCÍA (Clave por sociedad)", "SERVIALL", "ATOCHA (ORALPRIMA)", "OCCIDENT", "ODONTOGROUP", "CH SALUD", "AURA SEGUROS", "CUSTOMEDIC"], "FCO. SILVELA": ["SANTALUCÍA (Clave por sociedad)", "SERVIALL", "ATOCHA (ORALPRIMA)", "OCCIDENT", "ADE (Clave llega a clínica)", "ODONTOGROUP", "CH SALUD", "AURA SEGUROS"], "MARCELINO CAMACHO": ["SANTALUCÍA (Clave por sociedad)", "SERVIALL", "ATOCHA (ORALPRIMA)", "OCCIDENT", "DENTYRED", "ADE (Clave llega a clínica)", "ODONTOGROUP", "CH SALUD", "AURA SEGUROS"], "STA. MARIA DE LA CABEZA": ["SANTALUCÍA (Clave por sociedad)", "SERVIALL", "ATOCHA (ORALPRIMA)", "OCCIDENT", "DENTYRED", "ADE (Clave llega a clínica)", "ODONTOGROUP", "CH SALUD", "AURA SEGUROS"], "BRAVO MURILLO": ["SANTALUCÍA (Clave por sociedad)", "SERVIALL", "ATOCHA (ORALPRIMA)", "OCCIDENT", "DENTYRED", "ADE (Clave llega a clínica)", "ODONTOGROUP", "CH SALUD", "AURA SEGUROS"], "ARGÜELLES": ["SANTALUCÍA (Clave por sociedad)", "SERVIALL", "ATOCHA (ORALPRIMA)", "OCCIDENT", "DENTYRED", "ADE (Clave llega a clínica)", "ODONTOGROUP", "CH SALUD", "AURA SEGUROS"], "FUENLABRADA": ["SANTALUCÍA (Clave por sociedad)", "SERVIALL", "ATOCHA (ORALPRIMA)", "OCCIDENT", "ADE (Clave llega a clínica)", "ODONTOGROUP", "CH SALUD", "AURA SEGUROS"], "SAN ISIDRO": ["SANTALUCÍA (Clave por sociedad)", "SERVIALL", "ATOCHA (ORALPRIMA)", "OCCIDENT", "DENTYRED", "ADE (Clave llega a clínica)", "ODONTOGROUP", "CH SALUD", "AURA SEGUROS"], "CHAMBERÍ": ["SANTALUCÍA (Clave por sociedad)", "SERVIALL", "ATOCHA (ORALPRIMA)", "DENTYRED", "ADE (Clave llega a clínica)", "ODONTOGROUP", "CH SALUD", "AURA SEGUROS"], "TALAVERA DE LA REINA": ["SANTALUCÍA (Clave por sociedad)", "SERVIALL", "ATOCHA (ORALPRIMA)", "CH SALUD", "AURA SEGUROS"], "CARRANZA": ["ODONTOGROUP", "CH SALUD"], "LEGANÉS": ["SERVIALL", "ATOCHA (ORALPRIMA)", "ODONTOGROUP", "CH SALUD"], "ALCORCÓN": ["SANTALUCÍA (Clave por sociedad)", "SERVIALL", "ATOCHA (ORALPRIMA)", "CH SALUD"], "MAJADAHONDA": [], "PRÍNCIPE DE VERGARA": ["SANTALUCÍA (Clave por sociedad)"]};
+
+const cont = document.getElementById('main-container');
+const blocks = [];
+
+function buildBlock(name, aseguradoras) {
+  const div = document.createElement('div');
+  div.className = 'clinic-block';
+  div.dataset.name = name.toLowerCase();
+  div.dataset.asgs = aseguradoras.map(a => a.toLowerCase()).join('||');
+
+  const list = aseguradoras.join(', ') + '.';
+  const copyText = name + '\n' + '='.repeat(50) + '\n(Aseguradoras): ' + aseguradoras.join(', ') + '.';
+  div.dataset.copytext = copyText;
+
+  div.innerHTML =
+    '<div class="clinic-title">' +
+      name +
+      '<span class="clinic-count">' + aseguradoras.length + ' aseguradora' + (aseguradoras.length !== 1 ? 's' : '') + '</span>' +
+      '<button class="copy-btn" onclick="copyBlock(this)">📋 Copiar</button>' +
+    '</div>' +
+    '<div class="clinic-divider"></div>' +
+    '<div><span class="aseg-label">(Aseguradoras):</span><span class="aseg-text">' + list + '</span></div>';
+  return div;
+}
+
+function copyBlock(btn) {
+  const block = btn.closest('.clinic-block');
+  const ta = document.getElementById('clipboard-area');
+  ta.value = block.dataset.copytext;
+  ta.select();
+  document.execCommand('copy');
+  btn.textContent = '✅ Copiado';
+  btn.classList.add('copied');
+  setTimeout(function(){ btn.innerHTML = '📋 Copiar'; btn.classList.remove('copied'); }, 2000);
+}
+
+Object.entries(DATA).sort(function(a,b){ return a[0].localeCompare(b[0],'es'); }).forEach(function(entry) {
+  const name = entry[0], asgs = entry[1];
+  if (!asgs.length) return;
+  const block = buildBlock(name, asgs);
+  blocks.push(block);
+  cont.appendChild(block);
+});
+
+document.getElementById('search').addEventListener('input', function(){
+  const q = this.value.toLowerCase().trim();
+  let v = 0;
+  blocks.forEach(function(b){
+    const show = !q || b.dataset.name.includes(q) || b.dataset.asgs.includes(q);
+    b.style.display = show ? '' : 'none';
+    if (show) v++;
+  });
+  document.getElementById('search-info').textContent = q
+    ? v + ' clínica' + (v!==1?'s':'') + ' encontrada' + (v!==1?'s':'')
+    : blocks.length + ' clínicas';
+});
+</script>
+</body>
+</html>
